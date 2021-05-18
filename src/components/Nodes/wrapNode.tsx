@@ -48,7 +48,9 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     snapGrid,
     isDragging,
     resizeObserver,
-  }: WrapNodeProps) => {
+    nestLevel,
+    children,
+  }: React.PropsWithChildren<WrapNodeProps>) => {
     const observerInitialized = useRef<boolean>(false);
     const updateNodeDimensions = useStoreActions((actions) => actions.updateNodeDimensions);
     const addSelectedElements = useStoreActions((actions) => actions.addSelectedElements);
@@ -62,7 +64,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
 
     const nodeStyle: CSSProperties = useMemo(
       () => ({
-        zIndex: selected ? 10 : 3,
+        zIndex: (selected ? 10 : 3) + (10 * nestLevel),
         transform: `translate(${xPos}px,${yPos}px)`,
         pointerEvents:
           isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave ? 'all' : 'none',
@@ -135,6 +137,10 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
 
     const onDragStart = useCallback(
       (event: DraggableEvent) => {
+        // For nodes with parent nodes, ensure dragging the child does not also drag the parent
+        // https://github.com/react-grid-layout/react-draggable/issues/11
+        event.stopPropagation();
+
         onNodeDragStart?.(event as MouseEvent, node);
 
         if (selectNodesOnDrag && isSelectable) {
@@ -270,7 +276,9 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
               sourcePosition={sourcePosition}
               targetPosition={targetPosition}
               isDragging={isDragging}
-            />
+            >
+              {children}
+            </NodeComponent>
           </Provider>
         </div>
       </DraggableCore>
