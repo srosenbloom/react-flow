@@ -58,7 +58,6 @@ const NodeRenderer = (props: NodeRendererProps) => {
   }, []);
 
   const renderNode = (node: Node, nestLevel = 0) => {
-    console.log('Rendering node '+ node.id + ' with parentId ' + node.parentId + ' at nest level ' + nestLevel);
     const nodeType = node.type || 'default';
     const NodeComponent = (props.nodeTypes[nodeType] || props.nodeTypes.default) as ComponentType<WrapNodeProps>;
 

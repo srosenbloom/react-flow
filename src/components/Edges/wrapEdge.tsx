@@ -51,6 +51,7 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
     const unsetNodesSelection = useStoreActions((actions) => actions.unsetNodesSelection);
     const setPosition = useStoreActions((actions) => actions.setConnectionPosition);
     const connectionMode = useStoreState((state) => state.connectionMode);
+    const nodes = useStoreState((state) => state.nodes);
 
     const [updating, setUpdating] = useState<boolean>(false);
 
@@ -177,6 +178,18 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
       return null;
     }
 
+    const sourceNode = nodes.find(n => n.id === source);
+    const targetNode = nodes.find(n => n.id === target);
+
+    const sourceParent = nodes.find(n => n.id === sourceNode?.parentId);
+    const targetParent = nodes.find(n => n.id === targetNode?.parentId);
+
+    // TODO: Make these not hard-coded
+    // Also TODO: Fix initial rendering while dragging edge
+    const padding = 13;
+    const titleHeight = 12;
+    const nameHeight = 29;
+
     return (
       <g
         className={edgeClasses}
@@ -202,10 +215,10 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
           data={data}
           style={style}
           arrowHeadType={arrowHeadType}
-          sourceX={sourceX}
-          sourceY={sourceY}
-          targetX={targetX}
-          targetY={targetY}
+          sourceX={sourceX + (sourceParent?.__rf.position.x ?? 0) + padding}
+          sourceY={sourceY + (sourceParent?.__rf.position.y ?? 0) + padding + nameHeight + titleHeight}
+          targetX={targetX + (targetParent?.__rf.position.x ?? 0) + padding}
+          targetY={targetY + (targetParent?.__rf.position.y ?? 0) + padding + nameHeight + titleHeight}
           sourcePosition={sourcePosition}
           targetPosition={targetPosition}
           markerEndId={markerEndId}
