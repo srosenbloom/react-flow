@@ -20,6 +20,7 @@ interface ConnectionLineProps {
   connectionPositionX: number;
   connectionPositionY: number;
   connectionLineType: ConnectionLineType;
+  getEdgeOffsets: (nodes: Node[], nodeId: string) => [number, number];
   nodes: Node[];
   transform: Transform;
   isConnectable: boolean;
@@ -35,6 +36,7 @@ export default ({
   connectionPositionX,
   connectionPositionY,
   connectionLineType = ConnectionLineType.Bezier,
+  getEdgeOffsets,
   nodes = [],
   transform,
   isConnectable,
@@ -58,8 +60,10 @@ export default ({
     : sourceNode.__rf.handleBounds[connectionHandleType][0];
   const sourceHandleX = sourceHandle ? sourceHandle.x + sourceHandle.width / 2 : sourceNode.__rf.width / 2;
   const sourceHandleY = sourceHandle ? sourceHandle.y + sourceHandle.height / 2 : sourceNode.__rf.height;
-  const sourceX = sourceNode.__rf.position.x + sourceHandleX;
-  const sourceY = sourceNode.__rf.position.y + sourceHandleY;
+
+  const [sourceEdgeOffsetX, sourceEdgeOffsetY] = getEdgeOffsets(nodes, connectionNodeId);
+  const sourceX = sourceNode.__rf.position.x + sourceHandleX + sourceEdgeOffsetX;
+  const sourceY = sourceNode.__rf.position.y + sourceHandleY + sourceEdgeOffsetY;
 
   const targetX = (connectionPositionX - transform[0]) / transform[2];
   const targetY = (connectionPositionY - transform[1]) / transform[2];

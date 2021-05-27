@@ -4,7 +4,7 @@ import { useStoreState } from '../../store/hooks';
 import ConnectionLine from '../../components/ConnectionLine/index';
 import { isEdge } from '../../utils/graph';
 import MarkerDefinitions from './MarkerDefinitions';
-import { getEdgePositions, getHandle, isEdgeVisible, getSourceTargetNodes } from './utils';
+import { getEdgeOffsets, getEdgePositions, getHandle, isEdgeVisible, getSourceTargetNodes } from './utils';
 import {
   Position,
   Edge,
@@ -49,6 +49,7 @@ interface EdgeWrapperProps {
   height: number;
   onlyRenderVisibleElements: boolean;
   connectionMode?: ConnectionMode;
+  getEdgeOffsets: (nodes: Node[], nodeId: string) => [number, number];
 }
 
 const Edge = ({
@@ -62,6 +63,7 @@ const Edge = ({
   height,
   onlyRenderVisibleElements,
   connectionMode,
+  getEdgeOffsets
 }: EdgeWrapperProps) => {
   const sourceHandleId = edge.sourceHandle || null;
   const targetHandleId = edge.targetHandle || null;
@@ -177,6 +179,7 @@ const Edge = ({
       edgeUpdaterRadius={props.edgeUpdaterRadius}
       onEdgeDoubleClick={props.onEdgeDoubleClick}
       onEdgeUpdateStart={props.onEdgeUpdateStart}
+      getEdgeOffsets={getEdgeOffsets}
     />
   );
 };
@@ -225,6 +228,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
             width={width}
             height={height}
             onlyRenderVisibleElements={onlyRenderVisibleElements}
+            getEdgeOffsets={getEdgeOffsets}
           />
         ))}
         {renderConnectionLine && (
@@ -240,6 +244,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
             connectionLineType={connectionLineType}
             isConnectable={nodesConnectable}
             CustomConnectionLineComponent={connectionLineComponent}
+            getEdgeOffsets={getEdgeOffsets}
           />
         )}
       </g>

@@ -3,7 +3,7 @@ import cc from 'classcat';
 
 import { useStoreActions, useStoreState } from '../../store/hooks';
 import { Edge, EdgeProps, WrapEdgeProps } from '../../types';
-import { onMouseDown } from '../../components/Handle/handler';
+import { onMouseDown } from '../Handle/handler';
 import { EdgeAnchor } from './EdgeAnchor';
 
 export default (EdgeComponent: ComponentType<EdgeProps>) => {
@@ -45,6 +45,7 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
     onMouseLeave,
     edgeUpdaterRadius,
     onEdgeUpdateStart,
+    getEdgeOffsets
   }: WrapEdgeProps): JSX.Element | null => {
     const addSelectedElements = useStoreActions((actions) => actions.addSelectedElements);
     const setConnectionNodeId = useStoreActions((actions) => actions.setConnectionNodeId);
@@ -178,68 +179,8 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
       return null;
     }
 
-    console.log({ source, target });
-
-    const sourceNode = nodes.find(n => n.id === source);
-    const targetNode = nodes.find(n => n.id === target);
-
-    const sourceParent = nodes.find(n => {
-      console.log({ n, snpid: sourceNode?.parentId})
-      return n.id === sourceNode?.parentId
-    });
-    const targetParent = nodes.find(n => {
-      console.log({ n, tnpid: targetNode?.parentId})
-      return n.id === targetNode?.parentId
-    });
-
-    // TODO: Make these not hard-coded
-    // Also TODO: Fix initial rendering while dragging edge
-    // const padding = 13;
-    // const titleHeight = 12;
-    // const nameHeight = 29;
-    // const a = sourceNode?.parentId ?? -1
-    // const b = sourceParent?.parentId ?? -1
-    // const c = targetNode?.parentId ?? -1
-    // const d = targetParent?.parentId ?? -1
-    // // document.querySelector(`[data-nodeid="${}"]`)
-    // console.log({ a, b, c, d })
-    // const sourceNodeElement = document.querySelector(`[data-nodeid="${a}"]`);
-    // const sourceParentElement = document.querySelector(`[data-nodeid="${b}"]`);
-    // const targetNodeElement = document.querySelector(`[data-nodeid="${c}"]`);
-    // const targetParentElement = document.querySelector(`[data-nodeid="${d}"]`);
-
-    // console.log({ sourceNodeElement, targetNodeElement });
-    // console.log(sourceNodeElement?.getBoundingClientRect());
-    // console.log(targetNodeElement?.getBoundingClientRect());
-
-
-    // const sourceNodeOffsetX = (sourceNodeElement?.getBoundingClientRect().left ?? 0) - (sourceParentElement?.getBoundingClientRect().left ?? 0);
-    // const sourceNodeOffsetY = (sourceNodeElement?.getBoundingClientRect().top ?? 0) - (sourceParentElement?.getBoundingClientRect().top ?? 0);
-    // const targetNodeOffsetX = (targetNodeElement?.getBoundingClientRect().left ?? 0) - (targetParentElement?.getBoundingClientRect().left ?? 0);
-    // const targetNodeOffsetY = (targetNodeElement?.getBoundingClientRect().top ?? 0) - (targetParentElement?.getBoundingClientRect().top ?? 0); 
-
-    // console.log({ sourceNodeOffsetX, sourceNodeOffsetY, targetNodeOffsetX, targetNodeOffsetY })
-
-    const el1 = document.getElementById("idwithstylescontent");
-    const el2 = document.getElementById("idfornodeheader");
-    let el1padding = null
-    if (el1) {
-      el1padding = window.getComputedStyle(el1).getPropertyValue('padding');
-    }
-    let el2Height = null
-    if (el2) {
-      el2Height = window.getComputedStyle(el2).getPropertyValue('height');
-    }
-    const convertFromPxToNum = (pxNumString: string | null): Number => {
-      if (!pxNumString) {
-        return 0
-      }
-
-      const allButPx = pxNumString.slice(0, pxNumString.length - 2)
-      console.log({ pxNumString, allButPx })
-      return Number(allButPx)
-    }
-    const [elementPadding, elementHeight] = [el1padding, el2Height].map(convertFromPxToNum)
+    const [sourceEdgeOffsetX, sourceEdgeOffsetY] = getEdgeOffsets(nodes, source);
+    const [targetEdgeOffsetX, targetEdgeOffsetY] = getEdgeOffsets(nodes, target);
 
     return (
       <g
@@ -266,10 +207,10 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
           data={data}
           style={style}
           arrowHeadType={arrowHeadType}
-          sourceX={sourceX + (sourceParent?.__rf.position.x ?? 0) + elementPadding} // + sourceNodeOffsetX} // + elementPadding}
-          sourceY={sourceY + (sourceParent?.__rf.position.y ?? 0) + elementPadding + elementHeight} // + sourceNodeOffsetY} //  + elementPadding + elementHeight}
-          targetX={targetX + (targetParent?.__rf.position.x ?? 0) + elementPadding} // + targetNodeOffsetX} // + elementPadding}
-          targetY={targetY + (targetParent?.__rf.position.y ?? 0) + elementPadding + elementHeight} // + targetNodeOffsetY} // + elementPadding + elementHeight}
+          sourceX={sourceX + sourceEdgeOffsetX}
+          sourceY={sourceY + sourceEdgeOffsetY}
+          targetX={targetX + targetEdgeOffsetX}
+          targetY={targetY + targetEdgeOffsetY}
           sourcePosition={sourcePosition}
           targetPosition={targetPosition}
           markerEndId={markerEndId}

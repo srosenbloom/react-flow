@@ -112,6 +112,65 @@ export const getEdgePositions = (
   };
 };
 
+export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] => {
+  const node = nodes.find(n => n.id === nodeId);
+  const parent = nodes.find(n => n.id === node?.parentId);
+
+  // TODO: Make these not hard-coded
+  // Also TODO: Fix initial rendering while dragging edge
+  // const padding = 13;
+  // const titleHeight = 12;
+  // const nameHeight = 29;
+  // const a = sourceNode?.parentId ?? -1
+  // const b = sourceParent?.parentId ?? -1
+  // const c = targetNode?.parentId ?? -1
+  // const d = targetParent?.parentId ?? -1
+  // // document.querySelector(`[data-nodeid="${}"]`)
+  // console.log({ a, b, c, d })
+  // const sourceNodeElement = document.querySelector(`[data-nodeid="${a}"]`);
+  // const sourceParentElement = document.querySelector(`[data-nodeid="${b}"]`);
+  // const targetNodeElement = document.querySelector(`[data-nodeid="${c}"]`);
+  // const targetParentElement = document.querySelector(`[data-nodeid="${d}"]`);
+
+  // console.log({ sourceNodeElement, targetNodeElement });
+  // console.log(sourceNodeElement?.getBoundingClientRect());
+  // console.log(targetNodeElement?.getBoundingClientRect());
+
+
+  // const sourceNodeOffsetX = (sourceNodeElement?.getBoundingClientRect().left ?? 0) - (sourceParentElement?.getBoundingClientRect().left ?? 0);
+  // const sourceNodeOffsetY = (sourceNodeElement?.getBoundingClientRect().top ?? 0) - (sourceParentElement?.getBoundingClientRect().top ?? 0);
+  // const targetNodeOffsetX = (targetNodeElement?.getBoundingClientRect().left ?? 0) - (targetParentElement?.getBoundingClientRect().left ?? 0);
+  // const targetNodeOffsetY = (targetNodeElement?.getBoundingClientRect().top ?? 0) - (targetParentElement?.getBoundingClientRect().top ?? 0);
+
+  // console.log({ sourceNodeOffsetX, sourceNodeOffsetY, targetNodeOffsetX, targetNodeOffsetY })
+
+  const el1 = document.getElementById("idwithstylescontent");
+  const el2 = document.getElementById("idfornodeheader");
+  let el1padding = null
+  if (el1) {
+    el1padding = window.getComputedStyle(el1).getPropertyValue('padding');
+  }
+  let el2Height = null
+  if (el2) {
+    el2Height = window.getComputedStyle(el2).getPropertyValue('height');
+  }
+  const convertFromPxToNum = (pxNumString: string | null): Number => {
+    if (!pxNumString) {
+      return 0
+    }
+
+    const allButPx = pxNumString.slice(0, pxNumString.length - 2)
+    console.log({ pxNumString, allButPx })
+    return Number(allButPx)
+  }
+  const [elementPadding, elementHeight] = [el1padding, el2Height].map(convertFromPxToNum);
+
+  const xOffset = (parent?.__rf.position.x ?? 0) + elementPadding;
+  const yOffset = (parent?.__rf.position.y ?? 0) + elementPadding + elementHeight;
+
+  return [xOffset, yOffset];
+};
+
 interface IsEdgeVisibleParams {
   sourcePos: XYPosition;
   targetPos: XYPosition;
