@@ -45,14 +45,12 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
     onMouseLeave,
     edgeUpdaterRadius,
     onEdgeUpdateStart,
-    getEdgeOffsets
   }: WrapEdgeProps): JSX.Element | null => {
     const addSelectedElements = useStoreActions((actions) => actions.addSelectedElements);
     const setConnectionNodeId = useStoreActions((actions) => actions.setConnectionNodeId);
     const unsetNodesSelection = useStoreActions((actions) => actions.unsetNodesSelection);
     const setPosition = useStoreActions((actions) => actions.setConnectionPosition);
     const connectionMode = useStoreState((state) => state.connectionMode);
-    const nodes = useStoreState((state) => state.nodes);
 
     const [updating, setUpdating] = useState<boolean>(false);
 
@@ -179,9 +177,6 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
       return null;
     }
 
-    const [sourceEdgeOffsetX, sourceEdgeOffsetY] = getEdgeOffsets(nodes, source);
-    const [targetEdgeOffsetX, targetEdgeOffsetY] = getEdgeOffsets(nodes, target);
-
     return (
       <g
         className={edgeClasses}
@@ -207,10 +202,10 @@ export default (EdgeComponent: ComponentType<EdgeProps>) => {
           data={data}
           style={style}
           arrowHeadType={arrowHeadType}
-          sourceX={sourceX + sourceEdgeOffsetX}
-          sourceY={sourceY + sourceEdgeOffsetY}
-          targetX={targetX + targetEdgeOffsetX}
-          targetY={targetY + targetEdgeOffsetY}
+          sourceX={sourceX}
+          sourceY={sourceY}
+          targetX={targetX}
+          targetY={targetY}
           sourcePosition={sourcePosition}
           targetPosition={targetPosition}
           markerEndId={markerEndId}

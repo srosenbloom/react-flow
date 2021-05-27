@@ -133,7 +133,6 @@ export interface WrapEdgeProps<T = any> {
   onMouseLeave?: (event: React.MouseEvent, edge: Edge) => void;
   edgeUpdaterRadius?: number;
   onEdgeUpdateStart?: (event: React.MouseEvent, edge: Edge) => void;
-  getEdgeOffsets: (nodes: Node[], nodeId: string) => [number, number];
 }
 
 export interface EdgeProps<T = any> {
