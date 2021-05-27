@@ -113,7 +113,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
 
   return (
     <div className="react-flow__nodes" style={transformStyle}>
-      {visibleNodes.filter(node => !node.parentId).map(renderNode)}
+      {visibleNodes.filter(node => !node.parentId).map(node => renderNode(node, 0))}
     </div>
   );
 };
