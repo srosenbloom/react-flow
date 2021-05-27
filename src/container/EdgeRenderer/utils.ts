@@ -114,7 +114,9 @@ export const getEdgePositions = (
 
 export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] => {
   const node = nodes.find(n => n.id === nodeId);
-  const parent = nodes.find(n => n.id === node?.parentId);
+  const parent = node && nodes.find(n => n.id === node.parentId);
+  if (!parent)
+    return [0, 0];
 
   // TODO: Make these not hard-coded
   // Also TODO: Fix initial rendering while dragging edge
@@ -165,10 +167,12 @@ export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] 
   }
   const [elementPadding, elementHeight] = [el1padding, el2Height].map(convertFromPxToNum);
 
-  const xOffset = (parent?.__rf.position.x ?? 0) + elementPadding;
-  const yOffset = (parent?.__rf.position.y ?? 0) + elementPadding + elementHeight;
+  const xOffset = (parent.__rf.position.x ?? 0) + elementPadding;
+  const yOffset = (parent.__rf.position.y ?? 0) + elementPadding + elementHeight;
 
-  return [xOffset, yOffset];
+  const [parentXOffset, parentYOffset] = getEdgeOffsets(nodes, parent.id);
+
+  return [xOffset + parentXOffset, yOffset + parentYOffset];
 };
 
 interface IsEdgeVisibleParams {
