@@ -118,7 +118,7 @@ export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] 
   if (!parent || !node)
     return [0, 0];
 
-  const sceneNode = document.querySelector(`.react-flow__node-scene[data-id="${node.parentId}"]`)
+  const sceneNode = document.querySelector(`[data-id="${node.parentId}"]`)
   const findElemHeight = (elem: Element | null): null | string => {
     if (!elem) {
       return null

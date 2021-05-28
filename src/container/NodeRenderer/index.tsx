@@ -106,7 +106,9 @@ const NodeRenderer = (props: NodeRendererProps) => {
         resizeObserver={resizeObserver}
         nestLevel={nestLevel}
       >
-        {children.map(child => renderNode(child, nestLevel + 1))}
+        <div style={{ position: 'relative' }}>
+          {children.map(child => renderNode(child, nestLevel + 1))}
+        </div>
       </NodeComponent>
     );
   };
