@@ -115,22 +115,43 @@ export const getEdgePositions = (
 export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] => {
   const node = nodes.find(n => n.id === nodeId);
   const parent = node && nodes.find(n => n.id === node.parentId);
-  if (!parent)
+  if (!parent || !node)
     return [0, 0];
 
-  const rightNodeHandle = document.querySelector(`.react-flow__handle-right[data-nodeid="${nodeId}"]`)
-  const nodeElem = rightNodeHandle?.previousElementSibling
-  const nodeElemContent = nodeElem?.firstElementChild
-  let nodeElemPadding = null
-  if (nodeElem) {
-    nodeElemPadding = window.getComputedStyle(nodeElem).getPropertyValue('padding');
+  const sceneNode = document.querySelector(`.react-flow__node-scene[data-id="${node.parentId}"]`)
+  const findElemHeight = (elem: Element | null): null | string => {
+    if (!elem) {
+      return null
+    }
+    return window.getComputedStyle(elem).getPropertyValue('height');
   }
-  let nodeElemContentHeight = null
-  if (nodeElemContent) {
-    nodeElemContentHeight = window.getComputedStyle(nodeElemContent).getPropertyValue('height');
+  const sceneNodeHeight = findElemHeight(sceneNode);  
+  
+  /**
+   * Find relevant parent element whose height is not
+   * the entire scene node height
+   */
+  const findRelevantParentNode = (currNodeElem: Element | null): Element | null => {
+    if (!currNodeElem) {
+      return null
+    }
+
+    const firstChildElem = currNodeElem.firstElementChild
+    const isHeightOfCurrentNodeElemSameAsParent = sceneNodeHeight === findElemHeight(currNodeElem)
+
+    if (isHeightOfCurrentNodeElemSameAsParent) {
+      return findRelevantParentNode(firstChildElem)
+    }
+
+    return currNodeElem.parentElement
   }
 
-  const convertFromPxToNum = (pxNumString: string | null): Number => {
+  /**
+   * Find relevant parent node for calculating height of the scene container
+   */
+  const relevantParentNode = findRelevantParentNode(sceneNode)
+
+  const convertFromPxToNum = (pxNumString: string | null): number => {
     if (!pxNumString) {
       return 0
     }
@@ -138,10 +159,15 @@ export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] 
     const allButPx = pxNumString.slice(0, pxNumString.length - 2)
     return Number(allButPx)
   }
-  const [elementPadding, elementHeight] = [nodeElemPadding, nodeElemContentHeight].map(convertFromPxToNum);
 
-  const xOffset = (parent.__rf.position.x ?? 0) + elementPadding;
-  const yOffset = (parent.__rf.position.y ?? 0) + elementPadding + elementHeight;
+  const totalContainingHeight = relevantParentNode
+    ? Array.from(relevantParentNode.children)
+      .map(i => findElemHeight(i))
+      .reduce((acc, j) => acc + convertFromPxToNum(j), 0) 
+    : 0
+
+  const xOffset = (parent.__rf.position.x ?? 0);// + elementPadding;
+  const yOffset = (parent.__rf.position.y ?? 0) + totalContainingHeight;// + elementPadding;
 
   const [parentXOffset, parentYOffset] = getEdgeOffsets(nodes, parent.id);
 
