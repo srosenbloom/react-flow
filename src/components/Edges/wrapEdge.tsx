@@ -3,7 +3,7 @@ import cc from 'classcat';
 
 import { useStoreActions, useStoreState } from '../../store/hooks';
 import { Edge, EdgeProps, WrapEdgeProps } from '../../types';
-import { onMouseDown } from '../../components/Handle/handler';
+import { onMouseDown } from '../Handle/handler';
 import { EdgeAnchor } from './EdgeAnchor';
 
 export default (EdgeComponent: ComponentType<EdgeProps>) => {

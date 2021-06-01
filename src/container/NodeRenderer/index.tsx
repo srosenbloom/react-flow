@@ -57,56 +57,65 @@ const NodeRenderer = (props: NodeRendererProps) => {
     });
   }, []);
 
+  const renderNode = (node: Node, nestLevel = 0) => {
+    const nodeType = node.type || 'default';
+    const NodeComponent = (props.nodeTypes[nodeType] || props.nodeTypes.default) as ComponentType<WrapNodeProps>;
+
+    if (!props.nodeTypes[nodeType]) {
+      console.warn(`Node type "${nodeType}" not found. Using fallback type "default".`);
+    }
+
+    const isDraggable = node.draggable || (nodesDraggable && typeof node.draggable === 'undefined');
+    const isSelectable = node.selectable || (elementsSelectable && typeof node.selectable === 'undefined');
+    const isConnectable = node.connectable || (nodesConnectable && typeof node.connectable === 'undefined');
+
+    const children = visibleNodes.filter(n => n.parentId === node.id);
+
+    return (
+      <NodeComponent
+        key={node.id}
+        id={node.id}
+        className={node.className}
+        style={node.style}
+        type={nodeType}
+        data={node.data}
+        sourcePosition={node.sourcePosition}
+        targetPosition={node.targetPosition}
+        isHidden={node.isHidden}
+        xPos={node.__rf.position.x}
+        yPos={node.__rf.position.y}
+        isDragging={node.__rf.isDragging}
+        isInitialized={node.__rf.width !== null && node.__rf.height !== null}
+        snapGrid={props.snapGrid}
+        snapToGrid={props.snapToGrid}
+        selectNodesOnDrag={props.selectNodesOnDrag}
+        onClick={props.onElementClick}
+        onMouseEnter={props.onNodeMouseEnter}
+        onMouseMove={props.onNodeMouseMove}
+        onMouseLeave={props.onNodeMouseLeave}
+        onContextMenu={props.onNodeContextMenu}
+        onNodeDoubleClick={props.onNodeDoubleClick}
+        onNodeDragStart={props.onNodeDragStart}
+        onNodeDrag={props.onNodeDrag}
+        onNodeDragStop={props.onNodeDragStop}
+        scale={transform[2]}
+        selected={selectedElements?.some(({ id }) => id === node.id) || false}
+        isDraggable={isDraggable}
+        isSelectable={isSelectable}
+        isConnectable={isConnectable}
+        resizeObserver={resizeObserver}
+        nestLevel={nestLevel}
+      >
+        <div style={{ position: 'relative' }}>
+          {children.map(child => renderNode(child, nestLevel + 1))}
+        </div>
+      </NodeComponent>
+    );
+  };
+
   return (
     <div className="react-flow__nodes" style={transformStyle}>
-      {visibleNodes.map((node) => {
-        const nodeType = node.type || 'default';
-        const NodeComponent = (props.nodeTypes[nodeType] || props.nodeTypes.default) as ComponentType<WrapNodeProps>;
-
-        if (!props.nodeTypes[nodeType]) {
-          console.warn(`Node type "${nodeType}" not found. Using fallback type "default".`);
-        }
-
-        const isDraggable = !!(node.draggable || (nodesDraggable && typeof node.draggable === 'undefined'));
-        const isSelectable = !!(node.selectable || (elementsSelectable && typeof node.selectable === 'undefined'));
-        const isConnectable = !!(node.connectable || (nodesConnectable && typeof node.connectable === 'undefined'));
-
-        return (
-          <NodeComponent
-            key={node.id}
-            id={node.id}
-            className={node.className}
-            style={node.style}
-            type={nodeType}
-            data={node.data}
-            sourcePosition={node.sourcePosition}
-            targetPosition={node.targetPosition}
-            isHidden={node.isHidden}
-            xPos={node.__rf.position.x}
-            yPos={node.__rf.position.y}
-            isDragging={node.__rf.isDragging}
-            isInitialized={node.__rf.width !== null && node.__rf.height !== null}
-            snapGrid={props.snapGrid}
-            snapToGrid={props.snapToGrid}
-            selectNodesOnDrag={props.selectNodesOnDrag}
-            onClick={props.onElementClick}
-            onMouseEnter={props.onNodeMouseEnter}
-            onMouseMove={props.onNodeMouseMove}
-            onMouseLeave={props.onNodeMouseLeave}
-            onContextMenu={props.onNodeContextMenu}
-            onNodeDoubleClick={props.onNodeDoubleClick}
-            onNodeDragStart={props.onNodeDragStart}
-            onNodeDrag={props.onNodeDrag}
-            onNodeDragStop={props.onNodeDragStop}
-            scale={transform[2]}
-            selected={selectedElements?.some(({ id }) => id === node.id) || false}
-            isDraggable={isDraggable}
-            isSelectable={isSelectable}
-            isConnectable={isConnectable}
-            resizeObserver={resizeObserver}
-          />
-        );
-      })}
+      {visibleNodes.filter(node => !node.parentId).map(node => renderNode(node, 0))}
     </div>
   );
 };

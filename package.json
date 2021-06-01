@@ -25,7 +25,8 @@
     "cy:open": "cypress open",
     "release": "npm run test && release-it",
     "release:notest": "release-it",
-    "release:next": "release-it --preRelease=next"
+    "release:next": "release-it --preRelease=next",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",

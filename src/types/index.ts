@@ -49,6 +49,7 @@ export interface Node<T = any> {
   draggable?: boolean;
   selectable?: boolean;
   connectable?: boolean;
+  parentId?: ElementId;
 }
 
 export enum ArrowHeadType {
@@ -242,6 +243,7 @@ export interface WrapNodeProps<T = any> {
   snapGrid?: SnapGrid;
   isDragging?: boolean;
   resizeObserver: ResizeObserver | null;
+  nestLevel: number;
 }
 
 export type FitViewParams = {

@@ -1,10 +1,10 @@
-import React, { memo, CSSProperties, useCallback } from 'react';
+import React, { memo, CSSProperties, useCallback, useMemo } from 'react';
 
 import { useStoreState } from '../../store/hooks';
 import ConnectionLine from '../../components/ConnectionLine/index';
 import { isEdge } from '../../utils/graph';
 import MarkerDefinitions from './MarkerDefinitions';
-import { getEdgePositions, getHandle, isEdgeVisible, getSourceTargetNodes } from './utils';
+import { getEdgeOffsets, getEdgePositions, getHandle, isEdgeVisible, getSourceTargetNodes } from './utils';
 import {
   Position,
   Edge,
@@ -121,6 +121,14 @@ const Edge = ({
     targetPosition
   );
 
+  const [sourceEdgeOffsetX, sourceEdgeOffsetY] = useMemo(() =>
+          getEdgeOffsets(nodes, edge.source)
+  , [nodes, edge.source]);
+
+  const [targetEdgeOffsetX, targetEdgeOffsetY] = useMemo(() =>
+          getEdgeOffsets(nodes, edge.target)
+  , [nodes, edge.target]);
+
   const isVisible = onlyRenderVisibleElements
     ? isEdgeVisible({
         sourcePos: { x: sourceX, y: sourceY },
@@ -159,10 +167,10 @@ const Edge = ({
       target={edge.target}
       sourceHandleId={sourceHandleId}
       targetHandleId={targetHandleId}
-      sourceX={sourceX}
-      sourceY={sourceY}
-      targetX={targetX}
-      targetY={targetY}
+      sourceX={sourceX + sourceEdgeOffsetX}
+      sourceY={sourceY + sourceEdgeOffsetY}
+      targetX={targetX + targetEdgeOffsetX}
+      targetY={targetY + targetEdgeOffsetY}
       sourcePosition={sourcePosition}
       targetPosition={targetPosition}
       elementsSelectable={elementsSelectable}
@@ -194,6 +202,10 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const elementsSelectable = useStoreState((state) => state.elementsSelectable);
   const width = useStoreState((state) => state.width);
   const height = useStoreState((state) => state.height);
+
+  const [connectionSourceOffsetX, connectionSourceOffsetY] = useMemo(() =>
+      connectionNodeId ? getEdgeOffsets(nodes, connectionNodeId) : [0, 0]
+  , [nodes, connectionNodeId]);
 
   if (!width) {
     return null;
@@ -238,6 +250,8 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
             transform={transform}
             connectionLineStyle={connectionLineStyle}
             connectionLineType={connectionLineType}
+            connectionSourceOffsetX={connectionSourceOffsetX}
+            connectionSourceOffsetY={connectionSourceOffsetY}
             isConnectable={nodesConnectable}
             CustomConnectionLineComponent={connectionLineComponent}
           />

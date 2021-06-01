@@ -112,6 +112,68 @@ export const getEdgePositions = (
   };
 };
 
+export const getEdgeOffsets = (nodes: Node[], nodeId: string): [number, number] => {
+  const node = nodes.find(n => n.id === nodeId);
+  const parent = node && nodes.find(n => n.id === node.parentId);
+  if (!parent || !node)
+    return [0, 0];
+
+  const sceneNode = document.querySelector(`[data-id="${node.parentId}"]`);
+  const findElemPropertyValue = (elem: Element | null, property: string): null | string => {
+    if (!elem) {
+      return null;
+    }
+    return window.getComputedStyle(elem).getPropertyValue(property);
+  }
+  const sceneNodeHeight = findElemPropertyValue(sceneNode, 'height');
+  
+  /**
+   * Find relevant parent element whose height is not
+   * the entire scene node height
+   */
+  const findRelevantParentNode = (currNodeElem: Element | null): Element | null => {
+    if (!currNodeElem) {
+      return null;
+    }
+
+    const firstChildElem = currNodeElem.firstElementChild;
+    const isHeightOfCurrentNodeElemSameAsParent = sceneNodeHeight === findElemPropertyValue(currNodeElem, 'height');
+
+    if (isHeightOfCurrentNodeElemSameAsParent) {
+      return findRelevantParentNode(firstChildElem);
+    }
+
+    return currNodeElem.parentElement;
+  }
+
+  const convertFromPxToNum = (pxNumString: string | null): number => {
+    if (!pxNumString) {
+      return 0;
+    }
+
+    const allButPx = pxNumString.slice(0, pxNumString.length - 2);
+    return Number(allButPx);
+  }
+
+  /**
+   * Find relevant parent node for calculating height of the scene container
+   */
+  const relevantParentNode = findRelevantParentNode(sceneNode);
+  const parentNodePadding = convertFromPxToNum(findElemPropertyValue(relevantParentNode, 'padding'));
+  const totalContainingHeight = relevantParentNode
+    ? Array.from(relevantParentNode.children)
+      .map(i => findElemPropertyValue(i, 'height'))
+      .reduce((acc, j) => acc + convertFromPxToNum(j), 0) 
+    : 0
+
+  const xOffset = (parent.__rf.position.x ?? 0) + parentNodePadding;
+  const yOffset = (parent.__rf.position.y ?? 0) + totalContainingHeight + parentNodePadding;
+
+  const [parentXOffset, parentYOffset] = getEdgeOffsets(nodes, parent.id);
+
+  return [xOffset + parentXOffset, yOffset + parentYOffset];
+};
+
 interface IsEdgeVisibleParams {
   sourcePos: XYPosition;
   targetPos: XYPosition;
