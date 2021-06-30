@@ -145,6 +145,8 @@ const Edge = ({
 
   const isSelected = selectedElements?.some((elm) => isEdge(elm) && elm.id === edge.id) || false;
 
+  console.log({ edgeStyle: edge.style })
+
   return (
     <EdgeComponent
       key={edge.id}
@@ -161,7 +163,7 @@ const Edge = ({
       labelBgStyle={edge.labelBgStyle}
       labelBgPadding={edge.labelBgPadding}
       labelBgBorderRadius={edge.labelBgBorderRadius}
-      style={edge.style}
+      style={{...edge.style, zIndex: 10000000}}
       arrowHeadType={edge.arrowHeadType}
       source={edge.source}
       target={edge.target}
@@ -220,12 +222,18 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   } = props;
   const transformStyle = `translate(${transform[0]},${transform[1]}) scale(${transform[2]})`;
   const renderConnectionLine = connectionNodeId && connectionHandleType;
+  //console.log({ state })
+  //const isParentedSceneSelected = 
+  //const zIndex = (selected ? 10 : 3) + (10 * nestLevel)
 
   return (
-    <svg width={width} height={height} className="react-flow__edges">
+    <div>
+        {edges.map((edge: Edge) => {
+          console.log({ iAmEdge: edge, edge, edgeProps: props});
+          return (
+            <svg width={width} height={height} className="react-flow__edges" style={{zIndex: 5}}>
       <MarkerDefinitions color={arrowHeadColor} />
       <g transform={transformStyle}>
-        {edges.map((edge: Edge) => (
           <Edge
             key={edge.id}
             edge={edge}
@@ -237,27 +245,25 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
             width={width}
             height={height}
             onlyRenderVisibleElements={onlyRenderVisibleElements}
-          />
-        ))}
-        {renderConnectionLine && (
-          <ConnectionLine
-            nodes={nodes}
-            connectionNodeId={connectionNodeId!}
-            connectionHandleId={connectionHandleId}
-            connectionHandleType={connectionHandleType!}
-            connectionPositionX={connectionPosition.x}
-            connectionPositionY={connectionPosition.y}
-            transform={transform}
-            connectionLineStyle={connectionLineStyle}
-            connectionLineType={connectionLineType}
-            connectionSourceOffsetX={connectionSourceOffsetX}
-            connectionSourceOffsetY={connectionSourceOffsetY}
-            isConnectable={nodesConnectable}
-            CustomConnectionLineComponent={connectionLineComponent}
-          />
-        )}
-      </g>
-    </svg>
+          />{renderConnectionLine && (
+            <ConnectionLine
+                nodes={nodes}
+                connectionNodeId={connectionNodeId!}
+                connectionHandleId={connectionHandleId}
+                connectionHandleType={connectionHandleType!}
+                connectionPositionX={connectionPosition.x}
+                connectionPositionY={connectionPosition.y}
+                transform={transform}
+                connectionLineStyle={connectionLineStyle}
+                connectionLineType={connectionLineType}
+                connectionSourceOffsetX={connectionSourceOffsetX}
+                connectionSourceOffsetY={connectionSourceOffsetY}
+                isConnectable={nodesConnectable}
+                CustomConnectionLineComponent={connectionLineComponent}
+              />
+            )}</g></svg>
+        )})}
+      </div>
   );
 };
 
