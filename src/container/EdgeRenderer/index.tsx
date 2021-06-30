@@ -223,47 +223,51 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const transformStyle = `translate(${transform[0]},${transform[1]}) scale(${transform[2]})`;
   const renderConnectionLine = connectionNodeId && connectionHandleType;
   //console.log({ state })
-  //const isParentedSceneSelected = 
+  //const isParentedSceneSelected =
   //const zIndex = (selected ? 10 : 3) + (10 * nestLevel)
 
   return (
     <div>
-        {edges.map((edge: Edge) => {
-          console.log({ iAmEdge: edge, edge, edgeProps: props});
-          return (
-            <svg width={width} height={height} className="react-flow__edges" style={{zIndex: 5}}>
-      <MarkerDefinitions color={arrowHeadColor} />
-      <g transform={transformStyle}>
-          <Edge
-            key={edge.id}
-            edge={edge}
-            props={props}
-            nodes={nodes}
-            selectedElements={selectedElements}
-            elementsSelectable={elementsSelectable}
-            transform={transform}
-            width={width}
-            height={height}
-            onlyRenderVisibleElements={onlyRenderVisibleElements}
-          />{renderConnectionLine && (
-            <ConnectionLine
+      {edges.map((edge: Edge) => {
+        console.log({ iAmEdge: edge, edge, edgeProps: props });
+        return (
+          <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: 5 }}>
+            <MarkerDefinitions color={arrowHeadColor} />
+            <g transform={transformStyle}>
+              <Edge
+                key={edge.id}
+                edge={edge}
+                props={props}
                 nodes={nodes}
-                connectionNodeId={connectionNodeId!}
-                connectionHandleId={connectionHandleId}
-                connectionHandleType={connectionHandleType!}
-                connectionPositionX={connectionPosition.x}
-                connectionPositionY={connectionPosition.y}
+                selectedElements={selectedElements}
+                elementsSelectable={elementsSelectable}
                 transform={transform}
-                connectionLineStyle={connectionLineStyle}
-                connectionLineType={connectionLineType}
-                connectionSourceOffsetX={connectionSourceOffsetX}
-                connectionSourceOffsetY={connectionSourceOffsetY}
-                isConnectable={nodesConnectable}
-                CustomConnectionLineComponent={connectionLineComponent}
+                width={width}
+                height={height}
+                onlyRenderVisibleElements={onlyRenderVisibleElements}
               />
-            )}</g></svg>
-        )})}
-      </div>
+              {renderConnectionLine && (
+                <ConnectionLine
+                  nodes={nodes}
+                  connectionNodeId={connectionNodeId!}
+                  connectionHandleId={connectionHandleId}
+                  connectionHandleType={connectionHandleType!}
+                  connectionPositionX={connectionPosition.x}
+                  connectionPositionY={connectionPosition.y}
+                  transform={transform}
+                  connectionLineStyle={connectionLineStyle}
+                  connectionLineType={connectionLineType}
+                  connectionSourceOffsetX={connectionSourceOffsetX}
+                  connectionSourceOffsetY={connectionSourceOffsetY}
+                  isConnectable={nodesConnectable}
+                  CustomConnectionLineComponent={connectionLineComponent}
+                />
+              )}
+            </g>
+          </svg>
+        );
+      })}
+    </div>
   );
 };
 
