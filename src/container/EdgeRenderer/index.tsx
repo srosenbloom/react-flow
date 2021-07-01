@@ -62,7 +62,7 @@ const Edge = ({
   width,
   height,
   onlyRenderVisibleElements,
-  connectionMode,
+  connectionMode
 }: EdgeWrapperProps) => {
   const sourceHandleId = edge.sourceHandle || null;
   const targetHandleId = edge.targetHandle || null;
@@ -229,12 +229,35 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   //const isParentedSceneSelected =
   //const zIndex = (selected ? 10 : 3) + (10 * nestLevel)
 
+  const sceneIdsPerEdgeConnection = (edgeTargetNodeId: string, edgeSourceNodeId: string): string[] => {
+    const edgeNodes = nodes.filter(n => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId)
+
+    let sceneIds = new Set() as Set<string>
+    for (const node of edgeNodes) {
+      if (node.parentId) {
+        sceneIds.add(node.parentId)
+      }
+    }
+    return Array.from(sceneIds)
+  }
+  const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined, edgeTargetNodeId: string, edgeSourceNodeId: string): number => {
+    console.log({ mostRecentlyTouchedSceneIds, edgeSourceNodeId, edgeTargetNodeId})
+    if (mostRecentlyTouchedSceneIds) {
+      const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
+      const isEdgeAtForefront = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId).includes(firstNodeSceneId)
+
+      return isEdgeAtForefront ? 3 : 2
+    }
+    
+    return 2
+  }
+
   return (
     <div>
       {edges.map((edge: Edge) => {
         console.log({ iAmEdge: edge, edge, edgeProps: props });
         return (
-          <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: 5 }}>
+          <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, edge.target, edge.source) }}>
             <MarkerDefinitions color={arrowHeadColor} />
             <g transform={transformStyle}>
               <Edge
