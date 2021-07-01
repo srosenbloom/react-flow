@@ -36,6 +36,7 @@ interface EdgeRendererProps {
   onEdgeMouseLeave?: (event: React.MouseEvent, edge: Edge) => void;
   onEdgeUpdateStart?: (event: React.MouseEvent, edge: Edge) => void;
   edgeUpdaterRadius?: number;
+  mostRecentlyTouchedSceneIds?: string[];
 }
 
 interface EdgeWrapperProps {
@@ -204,6 +205,8 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const elementsSelectable = useStoreState((state) => state.elementsSelectable);
   const width = useStoreState((state) => state.width);
   const height = useStoreState((state) => state.height);
+
+  console.log({ mostrecentlysomethingggg: props.mostRecentlyTouchedSceneIds })
 
   const [connectionSourceOffsetX, connectionSourceOffsetY] = useMemo(() =>
       connectionNodeId ? getEdgeOffsets(nodes, connectionNodeId) : [0, 0]

@@ -29,6 +29,7 @@ export interface GraphViewProps extends Omit<ReactFlowProps, 'onSelectionChange'
 
 const GraphView = ({
   nodeTypes,
+  mostRecentlyTouchedSceneIds,
   edgeTypes,
   onMove,
   onMoveStart,
@@ -278,6 +279,7 @@ const GraphView = ({
         onEdgeMouseLeave={onEdgeMouseLeave}
         onEdgeUpdateStart={onEdgeUpdateStart}
         edgeUpdaterRadius={edgeUpdaterRadius}
+        mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
       />
     </FlowRenderer>
   );
