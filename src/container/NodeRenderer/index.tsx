@@ -18,6 +18,7 @@ interface NodeRendererProps {
   snapToGrid: boolean;
   snapGrid: [number, number];
   onlyRenderVisibleElements: boolean;
+  mostRecentlyTouchedSceneIds?: string[];
 }
 
 const NodeRenderer = (props: NodeRendererProps) => {
@@ -34,13 +35,6 @@ const NodeRenderer = (props: NodeRendererProps) => {
   const visibleNodes = props.onlyRenderVisibleElements
     ? getNodesInside(nodes, { x: 0, y: 0, width, height }, transform, true)
     : nodes;
-
-  const transformStyle = useMemo(
-    () => ({
-      transform: `translate(${transform[0]}px,${transform[1]}px) scale(${transform[2]})`,
-    }),
-    [transform[0], transform[1], transform[2]]
-  );
 
   const resizeObserver = useMemo(() => {
     if (typeof ResizeObserver === 'undefined') {
@@ -72,6 +66,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
     const children = visibleNodes.filter(n => n.parentId === node.id);
 
     return (
+      
       <NodeComponent
         key={node.id}
         id={node.id}
@@ -105,6 +100,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
         isConnectable={isConnectable}
         resizeObserver={resizeObserver}
         nestLevel={nestLevel}
+        mostRecentlyTouchedSceneIds={props.mostRecentlyTouchedSceneIds}
       >
         <div style={{ position: 'relative' }}>
           {children.map(child => renderNode(child, nestLevel + 1))}
@@ -114,7 +110,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
   };
 
   return (
-    <div className="react-flow__nodes" style={transformStyle}>
+    <div className="react-flow__nodes">
       {visibleNodes.filter(node => !node.parentId).map(node => renderNode(node, 0))}
     </div>
   );

@@ -53,6 +53,7 @@ const FlowRenderer = ({
   onSelectionDrag,
   onSelectionDragStop,
   onSelectionContextMenu,
+  mostRecentlyTouchedSceneIds
 }: FlowRendererProps) => {
   const unsetNodesSelection = useStoreActions((actions) => actions.unsetNodesSelection);
   const resetSelectedElements = useStoreActions((actions) => actions.resetSelectedElements);
@@ -112,6 +113,7 @@ const FlowRenderer = ({
           onSelectionDrag={onSelectionDrag}
           onSelectionDragStop={onSelectionDragStop}
           onSelectionContextMenu={onSelectionContextMenu}
+          mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
         />
       )}
       <div className="react-flow__pane" onClick={onClick} onContextMenu={onContextMenu} onWheel={onWheel} />

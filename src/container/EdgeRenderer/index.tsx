@@ -164,7 +164,7 @@ const Edge = ({
       labelBgStyle={edge.labelBgStyle}
       labelBgPadding={edge.labelBgPadding}
       labelBgBorderRadius={edge.labelBgBorderRadius}
-      style={{...edge.style, zIndex: 10000000}}
+      style={edge.style}
       arrowHeadType={edge.arrowHeadType}
       source={edge.source}
       target={edge.target}
@@ -243,13 +243,18 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined, edgeTargetNodeId: string, edgeSourceNodeId: string): number => {
     console.log({ mostRecentlyTouchedSceneIds, edgeSourceNodeId, edgeTargetNodeId})
     if (mostRecentlyTouchedSceneIds) {
+      
       const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
-      const isEdgeAtForefront = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId).includes(firstNodeSceneId)
+      const isEdgeAtForefront = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId).includes(firstNodeSceneId);
+      const highestSceneIdPartOfEdge = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId)[0];
+      const relevantSceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => sceneId === highestSceneIdPartOfEdge);
+      const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => ary.length - idx;
+      const sceneZIndex = (isEdgeAtForefront ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
 
-      return isEdgeAtForefront ? 3 : 2
+      return sceneZIndex;
     }
     
-    return 2
+    return 3;
   }
 
   return (

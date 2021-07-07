@@ -244,6 +244,7 @@ const GraphView = ({
       onSelectionDrag={onSelectionDrag}
       onSelectionDragStop={onSelectionDragStop}
       onSelectionContextMenu={onSelectionContextMenu}
+      mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
     >
       <NodeRenderer
         nodeTypes={nodeTypes}
@@ -260,6 +261,7 @@ const GraphView = ({
         snapToGrid={snapToGrid}
         snapGrid={snapGrid}
         onlyRenderVisibleElements={onlyRenderVisibleElements}
+        mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
       />
       <EdgeRenderer
         edgeTypes={edgeTypes}

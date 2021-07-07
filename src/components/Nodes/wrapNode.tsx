@@ -12,7 +12,7 @@ import React, {
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 import cc from 'classcat';
 
-import { useStoreActions } from '../../store/hooks';
+import { useStoreActions, useStoreState } from '../../store/hooks';
 import { Provider } from '../../contexts/NodeIdContext';
 import { NodeComponentProps, WrapNodeProps } from '../../types';
 
@@ -50,12 +50,14 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     resizeObserver,
     nestLevel,
     children,
+    mostRecentlyTouchedSceneIds
   }: React.PropsWithChildren<WrapNodeProps>) => {
     const observerInitialized = useRef<boolean>(false);
     const updateNodeDimensions = useStoreActions((actions) => actions.updateNodeDimensions);
     const addSelectedElements = useStoreActions((actions) => actions.addSelectedElements);
     const updateNodePosDiff = useStoreActions((actions) => actions.updateNodePosDiff);
     const unsetNodesSelection = useStoreActions((actions) => actions.unsetNodesSelection);
+    const nodes = useStoreState(state => state.nodes)
 
     const nodeElement = useRef<HTMLDivElement>(null);
 
@@ -240,6 +242,30 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
       },
     ]);
 
+    const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
+      if (mostRecentlyTouchedSceneIds) {
+        const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
+        console.log({ firstNodeSceneId})
+        console.log({ nodeIdddddddddddd: id })
+        const relevantSceneNodeId = nodes.find(n => n.id === id)?.parentId;
+        console.log({ relevantSceneNodeId})
+        const isEdgeAtForefront = firstNodeSceneId === relevantSceneNodeId;
+        const isSceneAndFirstNodeSceneId = type === "scene" && firstNodeSceneId === id;
+        console.log({ isEdgeAtForefront })
+        const relevantSceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => relevantSceneNodeId === sceneId);
+        console.log({ relevantSceneIdIndex })
+        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => ary.length - idx;
+        console.log({ translateSceneIdIndexToZIndex })
+        const sceneZIndex = (isEdgeAtForefront || isSceneAndFirstNodeSceneId ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
+        //const sceneZIndex = translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex) * 10; // nestLevel should be 1
+
+        console.log({ sceneZIndex})
+        return sceneZIndex - 5; // make sure it's behind the edge
+      }
+      
+      return 3;
+    }
+
     return (
       <DraggableCore
         onStart={onDragStart}
@@ -255,7 +281,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         <div
           className={nodeClasses}
           ref={nodeElement}
-          style={nodeStyle}
+          style={{...nodeStyle, zIndex: calculateZIndexes(mostRecentlyTouchedSceneIds)}}
           onMouseEnter={onMouseEnterHandler}
           onMouseMove={onMouseMoveHandler}
           onMouseLeave={onMouseLeaveHandler}
