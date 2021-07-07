@@ -3,7 +3,7 @@ import React, { useEffect, useRef, memo } from 'react';
 import { useStoreActions, useStore } from '../../store/hooks';
 import FlowRenderer from '../FlowRenderer';
 import NodeRenderer from '../NodeRenderer';
-import EdgeRenderer from '../EdgeRenderer';
+// import EdgeRenderer from '../EdgeRenderer';
 import { onLoadProject, onLoadGetElements, onLoadToObject } from '../../utils/graph';
 import useZoomPanHelper from '../../hooks/useZoomPanHelper';
 
@@ -216,6 +216,27 @@ const GraphView = ({
     }
   }, [connectionMode]);
 
+  const edgeProps = {
+    edgeTypes,
+    onElementClick,
+    onEdgeDoubleClick,
+    connectionLineType,
+    connectionLineStyle,
+    connectionLineComponent,
+    connectionMode,
+    arrowHeadColor,
+    markerEndId,
+    onEdgeUpdate,
+    onlyRenderVisibleElements,
+    onEdgeContextMenu,
+    onEdgeMouseEnter,
+    onEdgeMouseMove,
+    onEdgeMouseLeave,
+    onEdgeUpdateStart,
+    edgeUpdaterRadius,
+    mostRecentlyTouchedSceneIds
+  }
+
   return (
     <FlowRenderer
       onPaneClick={onPaneClick}
@@ -262,8 +283,9 @@ const GraphView = ({
         snapGrid={snapGrid}
         onlyRenderVisibleElements={onlyRenderVisibleElements}
         mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
+        edgeProps={edgeProps}
       />
-      <EdgeRenderer
+      {/*<EdgeRenderer
         edgeTypes={edgeTypes}
         onElementClick={onElementClick}
         onEdgeDoubleClick={onEdgeDoubleClick}
@@ -282,7 +304,7 @@ const GraphView = ({
         onEdgeUpdateStart={onEdgeUpdateStart}
         edgeUpdaterRadius={edgeUpdaterRadius}
         mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
-      />
+      />*/}
     </FlowRenderer>
   );
 };

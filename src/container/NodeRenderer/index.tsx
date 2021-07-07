@@ -1,8 +1,36 @@
-import React, { memo, useMemo, ComponentType, MouseEvent } from 'react';
+import React, { memo, useMemo, ComponentType, MouseEvent, CSSProperties } from 'react';
 
 import { getNodesInside } from '../../utils/graph';
 import { useStoreState, useStoreActions } from '../../store/hooks';
-import { Node, NodeTypesType, WrapNodeProps, Edge } from '../../types';
+import { Node, NodeTypesType, WrapNodeProps, Edge,
+  ConnectionLineType,
+  ConnectionLineComponent,
+  ConnectionMode,
+  OnEdgeUpdateFunc
+ } from '../../types';
+import EdgeRenderer from '../EdgeRenderer/index';
+
+interface EdgeRendererProps {
+  edgeTypes: any;
+  connectionLineType: ConnectionLineType;
+  connectionLineStyle?: CSSProperties;
+  connectionLineComponent?: ConnectionLineComponent;
+  connectionMode?: ConnectionMode;
+  onElementClick?: (event: React.MouseEvent, element: Node | Edge) => void;
+  onEdgeDoubleClick?: (event: React.MouseEvent, edge: Edge) => void;
+  arrowHeadColor: string;
+  markerEndId?: string;
+  onlyRenderVisibleElements: boolean;
+  onEdgeUpdate?: OnEdgeUpdateFunc;
+  onEdgeContextMenu?: (event: React.MouseEvent, edge: Edge) => void;
+  onEdgeMouseEnter?: (event: React.MouseEvent, edge: Edge) => void;
+  onEdgeMouseMove?: (event: React.MouseEvent, edge: Edge) => void;
+  onEdgeMouseLeave?: (event: React.MouseEvent, edge: Edge) => void;
+  onEdgeUpdateStart?: (event: React.MouseEvent, edge: Edge) => void;
+  edgeUpdaterRadius?: number;
+  mostRecentlyTouchedSceneIds?: string[];
+}
+
 interface NodeRendererProps {
   nodeTypes: NodeTypesType;
   selectNodesOnDrag: boolean;
@@ -19,6 +47,7 @@ interface NodeRendererProps {
   snapGrid: [number, number];
   onlyRenderVisibleElements: boolean;
   mostRecentlyTouchedSceneIds?: string[];
+  edgeProps: EdgeRendererProps;
 }
 
 const NodeRenderer = (props: NodeRendererProps) => {
@@ -31,6 +60,12 @@ const NodeRenderer = (props: NodeRendererProps) => {
   const height = useStoreState((state) => state.height);
   const nodes = useStoreState((state) => state.nodes);
   const updateNodeDimensions = useStoreActions((actions) => actions.updateNodeDimensions);
+  const transformStyle = useMemo(
+    () => ({
+      transform: `translate(${transform[0]}px,${transform[1]}px) scale(${transform[2]})`,
+    }),
+    [transform[0], transform[1], transform[2]]
+  );
 
   const visibleNodes = props.onlyRenderVisibleElements
     ? getNodesInside(nodes, { x: 0, y: 0, width, height }, transform, true)
@@ -109,9 +144,32 @@ const NodeRenderer = (props: NodeRendererProps) => {
     );
   };
 
+  // const other = {...transformStyle, zIndex: 3, transformOrigin: "0 0", position: 'absolute'}
+
+
   return (
-    <div className="react-flow__nodes">
+    <div className="react-flow__nodes" style={transformStyle}>   
       {visibleNodes.filter(node => !node.parentId).map(node => renderNode(node, 0))}
+      <EdgeRenderer
+        edgeTypes={props.edgeProps.edgeTypes}
+        onElementClick={props.edgeProps.onElementClick}
+        onEdgeDoubleClick={props.edgeProps.onEdgeDoubleClick}
+        connectionLineType={props.edgeProps.connectionLineType}
+        connectionLineStyle={props.edgeProps.connectionLineStyle}
+        connectionLineComponent={props.edgeProps.connectionLineComponent}
+        connectionMode={props.edgeProps.connectionMode}
+        arrowHeadColor={props.edgeProps.arrowHeadColor}
+        markerEndId={props.edgeProps.markerEndId}
+        onEdgeUpdate={props.edgeProps.onEdgeUpdate}
+        onlyRenderVisibleElements={props.edgeProps.onlyRenderVisibleElements}
+        onEdgeContextMenu={props.edgeProps.onEdgeContextMenu}
+        onEdgeMouseEnter={props.edgeProps.onEdgeMouseEnter}
+        onEdgeMouseMove={props.edgeProps.onEdgeMouseMove}
+        onEdgeMouseLeave={props.edgeProps.onEdgeMouseLeave}
+        onEdgeUpdateStart={props.edgeProps.onEdgeUpdateStart}
+        edgeUpdaterRadius={props.edgeProps.edgeUpdaterRadius}
+        mostRecentlyTouchedSceneIds={props.edgeProps.mostRecentlyTouchedSceneIds}
+      />
     </div>
   );
 };
