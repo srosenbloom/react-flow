@@ -244,23 +244,20 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
 
     const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
       if (mostRecentlyTouchedSceneIds) {
-        const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
-        console.log({ firstNodeSceneId})
-        console.log({ nodeIdddddddddddd: id })
-        const relevantSceneNodeId = nodes.find(n => n.id === id)?.parentId;
-        console.log({ relevantSceneNodeId})
-        const isEdgeAtForefront = firstNodeSceneId === relevantSceneNodeId;
-        const isSceneAndFirstNodeSceneId = type === "scene" && firstNodeSceneId === id;
-        console.log({ isEdgeAtForefront })
+        //const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
+        const parentId = nodes.find(n => n.id === id)?.parentId
+        const relevantSceneNodeId = parentId || id; // if cannot find node parent, that means it's a scene, and this is the scene id;
+        //const isEdgeAtForefront = firstNodeSceneId === relevantSceneNodeId;
+        //const isSceneAndFirstNodeSceneId = type === "scene" && firstNodeSceneId === id;
         const relevantSceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => relevantSceneNodeId === sceneId);
-        console.log({ relevantSceneIdIndex })
-        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => ary.length - idx;
-        console.log({ translateSceneIdIndexToZIndex })
-        const sceneZIndex = (isEdgeAtForefront || isSceneAndFirstNodeSceneId ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
+        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => idx === -1 ? 0 : ary.length - idx;
+        //const sceneZIndex = (isEdgeAtForefront || isSceneAndFirstNodeSceneId ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
+        const sceneZIndex = (10 + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex) * 10) + (parentId ? 5 : 0); // add +5 for nodes sitting on top of scenes
+        
+        console.log({ id, relevantSceneNodeId, relevantSceneIdIndex, translateSceneIdIndexToZIndex, sceneZIndex })
         //const sceneZIndex = translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex) * 10; // nestLevel should be 1
 
-        console.log({ sceneZIndex})
-        return sceneZIndex - 5; // make sure it's behind the edge
+        return sceneZIndex; // make sure it's behind the edge
       }
       
       return 3;
