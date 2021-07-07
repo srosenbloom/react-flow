@@ -229,21 +229,35 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   //const isParentedSceneSelected =
   //const zIndex = (selected ? 10 : 3) + (10 * nestLevel)
 
-  const sceneIdsPerEdgeConnection = (edgeTargetNodeId: string, edgeSourceNodeId: string): string[] => {
-    const edgeNodes = nodes.filter(n => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId)
+  // const sceneIdsPerEdgeConnection = (edgeTargetNodeId: string, edgeSourceNodeId: string): string[] => {
+  //   const edgeNodes = nodes.filter(n => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId)
 
-    let sceneIds = new Set() as Set<string>
-    for (const node of edgeNodes) {
-      if (node.parentId) {
-        sceneIds.add(node.parentId)
-      }
-    }
-    return Array.from(sceneIds)
-  }
+  //   let sceneIds = new Set() as Set<string>
+  //   for (const node of edgeNodes) {
+  //     if (node.parentId) {
+  //       sceneIds.add(node.parentId)
+  //     }
+  //   }
+  //   return Array.from(sceneIds)
+  // }
   const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined, edgeTargetNodeId: string, edgeSourceNodeId: string): number => {
     console.log({ mostRecentlyTouchedSceneIds, edgeSourceNodeId, edgeTargetNodeId})
     if (mostRecentlyTouchedSceneIds) {
-      
+
+      const parentIds = nodes.filter(n => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId).map(n => n?.parentId)
+      // const relevantSceneNodeId = parentId || id; // if cannot find node parent, that means it's a scene, and this is the scene id;
+      //const isEdgeAtForefront = firstNodeSceneId === relevantSceneNodeId;
+      //const isSceneAndFirstNodeSceneId = type === "scene" && firstNodeSceneId === id;
+      const relevantSceneIdIndex = Math.min(...parentIds.map(parentId => mostRecentlyTouchedSceneIds.findIndex(sceneId => parentId === sceneId)));
+      const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => idx === -1 ? 0 : ary.length - idx;
+      //const sceneZIndex = (isEdgeAtForefront || isSceneAndFirstNodeSceneId ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
+      const sceneZIndex = (10 + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex) * 10) + 5; // add +5 for nodes sitting on top of scenes
+      console.log("THIS IS INSIDE EDGE RENDERER")
+      console.log({ parentIds, relevantSceneIdIndex, sceneZIndex })
+      return sceneZIndex;
+
+
+      /** old 
       const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
       const isEdgeAtForefront = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId).includes(firstNodeSceneId);
       const highestSceneIdPartOfEdge = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId)[0];
@@ -252,6 +266,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
       const sceneZIndex = (isEdgeAtForefront ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
 
       return sceneZIndex;
+      */
     }
     
     return 3;
