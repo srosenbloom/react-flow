@@ -243,7 +243,6 @@ export interface WrapNodeProps<T = any> {
   snapGrid?: SnapGrid;
   isDragging?: boolean;
   resizeObserver: ResizeObserver | null;
-  nestLevel: number;
   mostRecentlyTouchedSceneIds?: string[];
 }
 

@@ -48,7 +48,6 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     snapGrid,
     isDragging,
     resizeObserver,
-    nestLevel,
     children,
     mostRecentlyTouchedSceneIds
   }: React.PropsWithChildren<WrapNodeProps>) => {
@@ -64,9 +63,55 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     const node = useMemo(() => ({ id, type, position: { x: xPos, y: yPos }, data }), [id, type, xPos, yPos, data]);
     const grid = useMemo(() => (snapToGrid ? snapGrid : [1, 1])! as [number, number], [snapToGrid, snapGrid]);
 
+    /**
+     * This is calculating z-index styles for overlay nodes and scene nodes.
+     * This is calculating scene node z-indexes in increments of 10: 10, 20, 30, 40, etc.
+     * Overlay node z-indexes use their parent's scene node z-index, but add an additional 5 because 
+     * we want overlay nodes to sit on top of scene nodes: 15, 25, 35, 45, etc.
+     * All scene and overlay nodes that haven't been touched will have z-indexes of 10 and 15, respectively.
+     * In case `mostRecentlyTouchedSceneIds` is `undefined`, which we wouldn't expect to happen, just apply a
+     * z-index that matches the default z-indexing defined in src/style.css
+     */
+     const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
+      if (mostRecentlyTouchedSceneIds) {
+        const parentId = nodes.find(n => n.id === id)?.parentId
+        const sceneNodeId = type === "scene" ? id : parentId;
+        const sceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => sceneNodeId === sceneId);
+
+        /**
+         * Part 1:
+         * First give a default z-index of 10 for every overlay node or scene node that hasn't been touched
+         */
+        const baseZIndexForNode = 10
+
+        /**
+         * Part 2:
+         * 1. If a scene hasn't been touched yet, it won't appear in `mostRecentlyTouchedSceneIds`, so give these nodes and scene nodes the lowest z-index
+         * 2. Otherwise, a lower `sceneIdIndex` means that that scene has been the more recently touched. So if we subtract that number from number of all 
+         * scene nodes that have been touched and multiply it by 10, we'll get scene z-indexes sequenced in increments of 10. 
+         */
+        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => idx === -1 ? 0 : (ary.length - idx) * 10;
+        
+        /**
+         * Part 3:
+         * We want overlay nodes to sit on top of scene nodes, so add an additional 5 to overlay nodes
+         */
+        const additionalZIndexForOverlayNodes = parentId ? 5 : 0
+
+        const sceneZIndex = baseZIndexForNode + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, sceneIdIndex) + additionalZIndexForOverlayNodes;
+
+        return sceneZIndex;
+      }
+      
+      // Default z-index for nodes and edges defined in src/style.css
+      return 3;
+    };
+
+    const calculateZIndexesValue = useMemo(() => calculateZIndexes(mostRecentlyTouchedSceneIds), [mostRecentlyTouchedSceneIds])
+
     const nodeStyle: CSSProperties = useMemo(
       () => ({
-        zIndex: (selected ? 10 : 3) + (10 * nestLevel),
+        zIndex: calculateZIndexesValue,
         transform: `translate(${xPos}px,${yPos}px)`,
         pointerEvents:
           isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave ? 'all' : 'none',
@@ -86,6 +131,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         onMouseEnter,
         onMouseMove,
         onMouseLeave,
+        calculateZIndexesValue
       ]
     );
     const onMouseEnterHandler = useMemo(() => {
@@ -242,27 +288,6 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
       },
     ]);
 
-    const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
-      if (mostRecentlyTouchedSceneIds) {
-        //const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
-        const parentId = nodes.find(n => n.id === id)?.parentId
-        const relevantSceneNodeId = parentId || id; // if cannot find node parent, that means it's a scene, and this is the scene id;
-        //const isEdgeAtForefront = firstNodeSceneId === relevantSceneNodeId;
-        //const isSceneAndFirstNodeSceneId = type === "scene" && firstNodeSceneId === id;
-        const relevantSceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => relevantSceneNodeId === sceneId);
-        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => idx === -1 ? 0 : ary.length - idx;
-        //const sceneZIndex = (isEdgeAtForefront || isSceneAndFirstNodeSceneId ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
-        const sceneZIndex = (10 + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex) * 10) + (parentId ? 5 : 0); // add +5 for nodes sitting on top of scenes
-        
-        console.log({ id, relevantSceneNodeId, relevantSceneIdIndex, translateSceneIdIndexToZIndex, sceneZIndex })
-        //const sceneZIndex = translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex) * 10; // nestLevel should be 1
-
-        return sceneZIndex; // make sure it's behind the edge
-      }
-      
-      return 3;
-    }
-
     return (
       <DraggableCore
         onStart={onDragStart}
@@ -278,7 +303,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         <div
           className={nodeClasses}
           ref={nodeElement}
-          style={{...nodeStyle, zIndex: calculateZIndexes(mostRecentlyTouchedSceneIds)}}
+          style={nodeStyle}
           onMouseEnter={onMouseEnterHandler}
           onMouseMove={onMouseMoveHandler}
           onMouseLeave={onMouseLeaveHandler}
