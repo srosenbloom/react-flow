@@ -223,7 +223,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
     connectionLineComponent,
     onlyRenderVisibleElements,
   } = props;
-  const transformStyle = `translate(${transform[0]},${transform[1]}) scale(${transform[2]})`;
+  // const transformStyle = `translate(${transform[0]},${transform[1]}) scale(${transform[2]})`;
   const renderConnectionLine = connectionNodeId && connectionHandleType;
   //console.log({ state })
   //const isParentedSceneSelected =
@@ -288,7 +288,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
         return (
           <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, edge.target, edge.source) }}>
             <MarkerDefinitions color={arrowHeadColor} />
-            <g transform={transformStyle}>
+            <g>
               <Edge
                 key={edge.id}
                 edge={edge}
