@@ -111,13 +111,13 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
       return 3;
     };
 
-    const calculateZIndexesValue = useMemo(() => calculateZIndexes(mostRecentlyTouchedSceneIds), [
+    const calculatedZIndexValue = useMemo(() => calculateZIndexes(mostRecentlyTouchedSceneIds), [
       mostRecentlyTouchedSceneIds,
     ]);
 
     const nodeStyle: CSSProperties = useMemo(
       () => ({
-        zIndex: calculateZIndexesValue,
+        zIndex: calculatedZIndexValue,
         transform: `translate(${xPos}px,${yPos}px)`,
         pointerEvents:
           isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave ? 'all' : 'none',
@@ -137,7 +137,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         onMouseEnter,
         onMouseMove,
         onMouseLeave,
-        calculateZIndexesValue,
+        calculatedZIndexValue,
       ]
     );
     const onMouseEnterHandler = useMemo(() => {
