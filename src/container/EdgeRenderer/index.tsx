@@ -240,7 +240,10 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   //   }
   //   return Array.from(sceneIds)
   // }
-  const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined, edgeTargetNodeId: string, edgeSourceNodeId: string): number => {
+  const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined, edgeTargetNodeId: string | null, edgeSourceNodeId: string | null, renderConnectionLine: boolean): number => {
+    if (renderConnectionLine && !(Boolean(edgeSourceNodeId) && Boolean(edgeTargetNodeId))) {
+      return 10000000;
+    }
     console.log({ mostRecentlyTouchedSceneIds, edgeSourceNodeId, edgeTargetNodeId})
     if (mostRecentlyTouchedSceneIds) {
 
@@ -283,14 +286,34 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
 
   return (
     <div>
+      {renderConnectionLine && <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, null, connectionNodeId, Boolean(renderConnectionLine)) }}>
+          <MarkerDefinitions color={arrowHeadColor} />
+          <g>
+            <ConnectionLine
+              nodes={nodes}
+              connectionNodeId={connectionNodeId!}
+              connectionHandleId={connectionHandleId}
+              connectionHandleType={connectionHandleType!}
+              connectionPositionX={connectionPosition.x}
+              connectionPositionY={connectionPosition.y}
+              transform={transform}
+              connectionLineStyle={connectionLineStyle}
+              connectionLineType={connectionLineType}
+              connectionSourceOffsetX={connectionSourceOffsetX}
+              connectionSourceOffsetY={connectionSourceOffsetY}
+              isConnectable={nodesConnectable}
+              CustomConnectionLineComponent={connectionLineComponent}
+            />
+          </g>
+        </svg>}
       {edges.map((edge: Edge) => {
         console.log({ iAmEdge: edge, edge, edgeProps: props });
         return (
-          <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, edge.target, edge.source) }}>
+          <svg key={edge.id} width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, edge.target, edge.source, Boolean(renderConnectionLine)) }}>
             <MarkerDefinitions color={arrowHeadColor} />
             <g>
               <Edge
-                key={edge.id}
+                key={`edge-${edge.id}`}
                 edge={edge}
                 props={props}
                 nodes={nodes}
@@ -301,23 +324,6 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
                 height={height}
                 onlyRenderVisibleElements={onlyRenderVisibleElements}
               />
-              {renderConnectionLine && (
-                <ConnectionLine
-                  nodes={nodes}
-                  connectionNodeId={connectionNodeId!}
-                  connectionHandleId={connectionHandleId}
-                  connectionHandleType={connectionHandleType!}
-                  connectionPositionX={connectionPosition.x}
-                  connectionPositionY={connectionPosition.y}
-                  transform={transform}
-                  connectionLineStyle={connectionLineStyle}
-                  connectionLineType={connectionLineType}
-                  connectionSourceOffsetX={connectionSourceOffsetX}
-                  connectionSourceOffsetY={connectionSourceOffsetY}
-                  isConnectable={nodesConnectable}
-                  CustomConnectionLineComponent={connectionLineComponent}
-                />
-              )}
             </g>
           </svg>
         );
