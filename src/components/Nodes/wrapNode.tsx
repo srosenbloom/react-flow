@@ -49,14 +49,14 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     isDragging,
     resizeObserver,
     children,
-    mostRecentlyTouchedSceneIds
+    mostRecentlyTouchedSceneIds,
   }: React.PropsWithChildren<WrapNodeProps>) => {
     const observerInitialized = useRef<boolean>(false);
     const updateNodeDimensions = useStoreActions((actions) => actions.updateNodeDimensions);
     const addSelectedElements = useStoreActions((actions) => actions.addSelectedElements);
     const updateNodePosDiff = useStoreActions((actions) => actions.updateNodePosDiff);
     const unsetNodesSelection = useStoreActions((actions) => actions.unsetNodesSelection);
-    const nodes = useStoreState(state => state.nodes)
+    const nodes = useStoreState((state) => state.nodes);
 
     const nodeElement = useRef<HTMLDivElement>(null);
 
@@ -66,48 +66,54 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     /**
      * This is calculating z-index styles for overlay nodes and scene nodes.
      * This is calculating scene node z-indexes in increments of 10: 10, 20, 30, 40, etc.
-     * Overlay node z-indexes use their parent's scene node z-index, but add an additional 5 because 
+     * Overlay node z-indexes use their parent's scene node z-index, but add an additional 5 because
      * we want overlay nodes to sit on top of scene nodes: 15, 25, 35, 45, etc.
      * All scene and overlay nodes that haven't been touched will have z-indexes of 10 and 15, respectively.
      * In case `mostRecentlyTouchedSceneIds` is `undefined`, which we wouldn't expect to happen, just apply a
      * z-index that matches the default z-indexing defined in src/style.css
      */
-     const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
+    const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
       if (mostRecentlyTouchedSceneIds) {
-        const parentId = nodes.find(n => n.id === id)?.parentId
-        const sceneNodeId = type === "scene" ? id : parentId;
-        const sceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => sceneNodeId === sceneId);
+        const parentId = nodes.find((n) => n.id === id)?.parentId;
+        const sceneNodeId = type === 'scene' ? id : parentId;
+        const sceneIdIndex = mostRecentlyTouchedSceneIds.findIndex((sceneId) => sceneNodeId === sceneId);
 
         /**
          * Part 1:
          * First give a default z-index of 10 for every overlay node or scene node that hasn't been touched
          */
-        const baseZIndexForNode = 10
+        const baseZIndexForNode = 10;
 
         /**
          * Part 2:
          * 1. If a scene hasn't been touched yet, it won't appear in `mostRecentlyTouchedSceneIds`, so give these nodes and scene nodes the lowest z-index
-         * 2. Otherwise, a lower `sceneIdIndex` means that that scene has been the more recently touched. So if we subtract that number from number of all 
-         * scene nodes that have been touched and multiply it by 10, we'll get scene z-indexes sequenced in increments of 10. 
+         * 2. Otherwise, a lower `sceneIdIndex` means that that scene has been the more recently touched. So if we subtract that number from number of all
+         * scene nodes that have been touched and multiply it by 10, we'll get scene z-indexes sequenced in increments of 10.
          */
-        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => idx === -1 ? 0 : (ary.length - idx) * 10;
-        
+        const translateSceneIdIndexToZIndex = (ary: string[], idx: number) =>
+          idx === -1 ? 0 : (ary.length - idx) * 10;
+
         /**
          * Part 3:
          * We want overlay nodes to sit on top of scene nodes, so add an additional 5 to overlay nodes
          */
-        const additionalZIndexForOverlayNodes = parentId ? 5 : 0
+        const additionalZIndexForOverlayNodes = parentId ? 5 : 0;
 
-        const sceneZIndex = baseZIndexForNode + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, sceneIdIndex) + additionalZIndexForOverlayNodes;
+        const sceneZIndex =
+          baseZIndexForNode +
+          translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, sceneIdIndex) +
+          additionalZIndexForOverlayNodes;
 
         return sceneZIndex;
       }
-      
+
       // Default z-index for nodes and edges defined in src/style.css
       return 3;
     };
 
-    const calculateZIndexesValue = useMemo(() => calculateZIndexes(mostRecentlyTouchedSceneIds), [mostRecentlyTouchedSceneIds])
+    const calculateZIndexesValue = useMemo(() => calculateZIndexes(mostRecentlyTouchedSceneIds), [
+      mostRecentlyTouchedSceneIds,
+    ]);
 
     const nodeStyle: CSSProperties = useMemo(
       () => ({
@@ -131,7 +137,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         onMouseEnter,
         onMouseMove,
         onMouseLeave,
-        calculateZIndexesValue
+        calculateZIndexesValue,
       ]
     );
     const onMouseEnterHandler = useMemo(() => {
