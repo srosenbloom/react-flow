@@ -18,7 +18,7 @@ import {
   OnEdgeUpdateFunc,
 } from '../../types';
 
-interface EdgeRendererProps {
+export interface EdgeRendererProps {
   edgeTypes: any;
   connectionLineType: ConnectionLineType;
   connectionLineStyle?: CSSProperties;
@@ -192,7 +192,7 @@ const Edge = ({
   );
 };
 
-const EdgeRenderer = (props: EdgeRendererProps) => {
+const BaseEdgeRenderer = (props: EdgeRendererProps) => {
   const transform = useStoreState((state) => state.transform);
   const nodes = useStoreState((state) => state.nodes);
   const edges = useStoreState((state) => state.edges);
@@ -372,6 +372,6 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   );
 };
 
-EdgeRenderer.displayName = 'EdgeRenderer';
+BaseEdgeRenderer.displayName = 'EdgeRenderer';
 
-export default memo(EdgeRenderer);
+export const EdgeRenderer = memo(BaseEdgeRenderer);

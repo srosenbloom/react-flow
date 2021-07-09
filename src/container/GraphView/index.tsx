@@ -3,7 +3,6 @@ import React, { useEffect, useRef, memo } from 'react';
 import { useStoreActions, useStore } from '../../store/hooks';
 import FlowRenderer from '../FlowRenderer';
 import NodeRenderer from '../NodeRenderer';
-// import EdgeRenderer from '../EdgeRenderer';
 import { onLoadProject, onLoadGetElements, onLoadToObject } from '../../utils/graph';
 import useZoomPanHelper from '../../hooks/useZoomPanHelper';
 

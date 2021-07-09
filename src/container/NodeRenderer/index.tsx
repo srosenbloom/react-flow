@@ -1,4 +1,4 @@
-import React, { memo, useMemo, ComponentType, MouseEvent, CSSProperties } from 'react';
+import React, { memo, useMemo, ComponentType, MouseEvent } from 'react';
 
 import { getNodesInside } from '../../utils/graph';
 import { useStoreState, useStoreActions } from '../../store/hooks';
@@ -7,33 +7,8 @@ import {
   NodeTypesType,
   WrapNodeProps,
   Edge,
-  ConnectionLineType,
-  ConnectionLineComponent,
-  ConnectionMode,
-  OnEdgeUpdateFunc,
 } from '../../types';
-import EdgeRenderer from '../EdgeRenderer/index';
-
-interface EdgeRendererProps {
-  edgeTypes: any;
-  connectionLineType: ConnectionLineType;
-  connectionLineStyle?: CSSProperties;
-  connectionLineComponent?: ConnectionLineComponent;
-  connectionMode?: ConnectionMode;
-  onElementClick?: (event: React.MouseEvent, element: Node | Edge) => void;
-  onEdgeDoubleClick?: (event: React.MouseEvent, edge: Edge) => void;
-  arrowHeadColor: string;
-  markerEndId?: string;
-  onlyRenderVisibleElements: boolean;
-  onEdgeUpdate?: OnEdgeUpdateFunc;
-  onEdgeContextMenu?: (event: React.MouseEvent, edge: Edge) => void;
-  onEdgeMouseEnter?: (event: React.MouseEvent, edge: Edge) => void;
-  onEdgeMouseMove?: (event: React.MouseEvent, edge: Edge) => void;
-  onEdgeMouseLeave?: (event: React.MouseEvent, edge: Edge) => void;
-  onEdgeUpdateStart?: (event: React.MouseEvent, edge: Edge) => void;
-  edgeUpdaterRadius?: number;
-  mostRecentlyTouchedSceneIds?: string[];
-}
+import { EdgeRenderer, EdgeRendererProps } from '../EdgeRenderer/index';
 
 interface NodeRendererProps {
   nodeTypes: NodeTypesType;
