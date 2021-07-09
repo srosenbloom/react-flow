@@ -148,8 +148,6 @@ const Edge = ({
 
   const isSelected = selectedElements?.some((elm) => isEdge(elm) && elm.id === edge.id) || false;
 
-  console.log({ edgeStyle: edge.style });
-
   return (
     <EdgeComponent
       key={edge.id}
@@ -208,8 +206,6 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const width = useStoreState((state) => state.width);
   const height = useStoreState((state) => state.height);
 
-  console.log({ mostrecentlysomethingggg: props.mostRecentlyTouchedSceneIds });
-
   const [connectionSourceOffsetX, connectionSourceOffsetY] = useMemo(
     () => (connectionNodeId ? getEdgeOffsets(nodes, connectionNodeId) : [0, 0]),
     [nodes, connectionNodeId]
@@ -230,8 +226,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const renderConnectionLine = connectionNodeId && connectionHandleType;
 
   /**
-   * This is calculating z-index styles for an edge.
-   * This is calculating scene node z-indexes in increments of 10 (+ 5): 15, 25, 35, 45, etc.
+   * This is calculating z-index styles for an edge in increments of 10 (+ 5): 15, 25, 35, 45, etc.
    * The strategy is to find the highest possible z-index associated with this edge.
    * If you're drawing the edge, then it should have the highest z-index value of anything
    * in our node view.
@@ -282,8 +277,8 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
         return Math.min(...uniqueSceneIdsIndexedByMostRecentlyTouched);
       };
       // A lower `sceneIdIndex` means that that scene has been the more recently touched. So if we subtract that number from number of all
-      // scene nodes that have been touched and multiply it by 10, we'll get scene z-indexes sequenced in increments of 10.
-      // And give edges belonging to scene nodes that haven't been touched the lowest z-index.
+      // scene nodes that have been touched and multiply it by 10, we'll get edge z-indexes sequenced in increments of 10.
+      // And give edges belonging to scene nodes that haven't been touched the lowest z-index (though we actually wouldn't expect this to happen).
       const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => (idx === -1 ? 0 : (ary.length - idx) * 10);
 
       /**
@@ -300,6 +295,7 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
       return sceneZIndex;
     }
 
+    // Default z-index found in src/style.css
     return 3;
   };
 

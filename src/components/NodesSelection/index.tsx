@@ -121,7 +121,7 @@ export default ({
   }
 
   return (
-    <div className="react-flow__nodesselection" style={style /*TODO: put zIndex here*/}>
+    <div className="react-flow__nodesselection" style={style}>
       <ReactDraggable
         scale={tScale}
         grid={grid}

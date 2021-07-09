@@ -216,7 +216,7 @@ const GraphView = ({
     }
   }, [connectionMode]);
 
-  const edgeProps = {
+  const edgeRendererProps = {
     edgeTypes,
     onElementClick,
     onEdgeDoubleClick,
@@ -267,6 +267,9 @@ const GraphView = ({
       onSelectionContextMenu={onSelectionContextMenu}
       mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
     >
+      {/**
+       * Per our modifications to this library, NodeRenderer renders edges, too (which is the EdgeRenderer)
+       */}
       <NodeRenderer
         nodeTypes={nodeTypes}
         onElementClick={onElementClick}
@@ -283,28 +286,8 @@ const GraphView = ({
         snapGrid={snapGrid}
         onlyRenderVisibleElements={onlyRenderVisibleElements}
         mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
-        edgeProps={edgeProps}
+        edgeRendererProps={edgeRendererProps}
       />
-      {/*<EdgeRenderer
-        edgeTypes={edgeTypes}
-        onElementClick={onElementClick}
-        onEdgeDoubleClick={onEdgeDoubleClick}
-        connectionLineType={connectionLineType}
-        connectionLineStyle={connectionLineStyle}
-        connectionLineComponent={connectionLineComponent}
-        connectionMode={connectionMode}
-        arrowHeadColor={arrowHeadColor}
-        markerEndId={markerEndId}
-        onEdgeUpdate={onEdgeUpdate}
-        onlyRenderVisibleElements={onlyRenderVisibleElements}
-        onEdgeContextMenu={onEdgeContextMenu}
-        onEdgeMouseEnter={onEdgeMouseEnter}
-        onEdgeMouseMove={onEdgeMouseMove}
-        onEdgeMouseLeave={onEdgeMouseLeave}
-        onEdgeUpdateStart={onEdgeUpdateStart}
-        edgeUpdaterRadius={edgeUpdaterRadius}
-        mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
-      />*/}
     </FlowRenderer>
   );
 };

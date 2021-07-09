@@ -47,7 +47,7 @@ interface NodeRendererProps {
   snapGrid: [number, number];
   onlyRenderVisibleElements: boolean;
   mostRecentlyTouchedSceneIds?: string[];
-  edgeProps: EdgeRendererProps;
+  edgeRendererProps: EdgeRendererProps;
 }
 
 const NodeRenderer = (props: NodeRendererProps) => {
@@ -145,26 +145,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
   return (
     <div className="react-flow__nodes" style={transformStyle}>   
       {visibleNodes.filter(node => !node.parentId).map(node => renderNode(node, 0))}
-      <EdgeRenderer
-        edgeTypes={props.edgeProps.edgeTypes}
-        onElementClick={props.edgeProps.onElementClick}
-        onEdgeDoubleClick={props.edgeProps.onEdgeDoubleClick}
-        connectionLineType={props.edgeProps.connectionLineType}
-        connectionLineStyle={props.edgeProps.connectionLineStyle}
-        connectionLineComponent={props.edgeProps.connectionLineComponent}
-        connectionMode={props.edgeProps.connectionMode}
-        arrowHeadColor={props.edgeProps.arrowHeadColor}
-        markerEndId={props.edgeProps.markerEndId}
-        onEdgeUpdate={props.edgeProps.onEdgeUpdate}
-        onlyRenderVisibleElements={props.edgeProps.onlyRenderVisibleElements}
-        onEdgeContextMenu={props.edgeProps.onEdgeContextMenu}
-        onEdgeMouseEnter={props.edgeProps.onEdgeMouseEnter}
-        onEdgeMouseMove={props.edgeProps.onEdgeMouseMove}
-        onEdgeMouseLeave={props.edgeProps.onEdgeMouseLeave}
-        onEdgeUpdateStart={props.edgeProps.onEdgeUpdateStart}
-        edgeUpdaterRadius={props.edgeProps.edgeUpdaterRadius}
-        mostRecentlyTouchedSceneIds={props.edgeProps.mostRecentlyTouchedSceneIds}
-      />
+      <EdgeRenderer {...props.edgeRendererProps} />
     </div>
   );
 };
