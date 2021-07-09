@@ -62,7 +62,7 @@ const Edge = ({
   width,
   height,
   onlyRenderVisibleElements,
-  connectionMode
+  connectionMode,
 }: EdgeWrapperProps) => {
   const sourceHandleId = edge.sourceHandle || null;
   const targetHandleId = edge.targetHandle || null;
@@ -122,13 +122,15 @@ const Edge = ({
     targetPosition
   );
 
-  const [sourceEdgeOffsetX, sourceEdgeOffsetY] = useMemo(() =>
-          getEdgeOffsets(nodes, edge.source)
-  , [nodes, edge.source]);
+  const [sourceEdgeOffsetX, sourceEdgeOffsetY] = useMemo(() => getEdgeOffsets(nodes, edge.source), [
+    nodes,
+    edge.source,
+  ]);
 
-  const [targetEdgeOffsetX, targetEdgeOffsetY] = useMemo(() =>
-          getEdgeOffsets(nodes, edge.target)
-  , [nodes, edge.target]);
+  const [targetEdgeOffsetX, targetEdgeOffsetY] = useMemo(() => getEdgeOffsets(nodes, edge.target), [
+    nodes,
+    edge.target,
+  ]);
 
   const isVisible = onlyRenderVisibleElements
     ? isEdgeVisible({
@@ -146,7 +148,7 @@ const Edge = ({
 
   const isSelected = selectedElements?.some((elm) => isEdge(elm) && elm.id === edge.id) || false;
 
-  console.log({ edgeStyle: edge.style })
+  console.log({ edgeStyle: edge.style });
 
   return (
     <EdgeComponent
@@ -206,11 +208,12 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
   const width = useStoreState((state) => state.width);
   const height = useStoreState((state) => state.height);
 
-  console.log({ mostrecentlysomethingggg: props.mostRecentlyTouchedSceneIds })
+  console.log({ mostrecentlysomethingggg: props.mostRecentlyTouchedSceneIds });
 
-  const [connectionSourceOffsetX, connectionSourceOffsetY] = useMemo(() =>
-      connectionNodeId ? getEdgeOffsets(nodes, connectionNodeId) : [0, 0]
-  , [nodes, connectionNodeId]);
+  const [connectionSourceOffsetX, connectionSourceOffsetY] = useMemo(
+    () => (connectionNodeId ? getEdgeOffsets(nodes, connectionNodeId) : [0, 0]),
+    [nodes, connectionNodeId]
+  );
 
   if (!width) {
     return null;
@@ -223,70 +226,99 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
     connectionLineComponent,
     onlyRenderVisibleElements,
   } = props;
-  // const transformStyle = `translate(${transform[0]},${transform[1]}) scale(${transform[2]})`;
+
   const renderConnectionLine = connectionNodeId && connectionHandleType;
-  //console.log({ state })
-  //const isParentedSceneSelected =
-  //const zIndex = (selected ? 10 : 3) + (10 * nestLevel)
 
-  // const sceneIdsPerEdgeConnection = (edgeTargetNodeId: string, edgeSourceNodeId: string): string[] => {
-  //   const edgeNodes = nodes.filter(n => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId)
-
-  //   let sceneIds = new Set() as Set<string>
-  //   for (const node of edgeNodes) {
-  //     if (node.parentId) {
-  //       sceneIds.add(node.parentId)
-  //     }
-  //   }
-  //   return Array.from(sceneIds)
-  // }
-  const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined, edgeTargetNodeId: string | null, edgeSourceNodeId: string | null, renderConnectionLine: boolean): number => {
-    if (renderConnectionLine && !(Boolean(edgeSourceNodeId) && Boolean(edgeTargetNodeId))) {
-      return 10000000;
+  /**
+   * This is calculating z-index styles for an edge.
+   * This is calculating scene node z-indexes in increments of 10 (+ 5): 15, 25, 35, 45, etc.
+   * The strategy is to find the highest possible z-index associated with this edge.
+   * If you're drawing the edge, then it should have the highest z-index value of anything
+   * in our node view.
+   * For the edges that are connected to two nodes, use the z-index value of the most recently
+   * touched scene node ID, since if an edge belongs to the most recently touched scene,
+   * then we want to see those associated edges moved to the forefront as well.
+   * In case `mostRecentlyTouchedSceneIds` is `undefined`, which we wouldn't expect to happen, just apply a
+   * z-index that matches the default z-indexing defined in src/style.css
+   */
+  const calculateZIndexes = (
+    mostRecentlyTouchedSceneIds: string[] | undefined,
+    edgeTargetNodeId: string | null,
+    edgeSourceNodeId: string | null,
+    shouldRenderConnectionLine: boolean
+  ): number => {
+    // You are drawing an edge if you should render a connection line but the target or source node is still `null`
+    const isDrawingEdge = shouldRenderConnectionLine && !(Boolean(edgeSourceNodeId) && Boolean(edgeTargetNodeId));
+    if (isDrawingEdge) {
+      return 10000000; // an arbitrarily high z-index while drawing
     }
-    console.log({ mostRecentlyTouchedSceneIds, edgeSourceNodeId, edgeTargetNodeId})
+
     if (mostRecentlyTouchedSceneIds) {
+      /**
+       * Part 1:
+       * First give a default z-index of 10 for every edge connected to a scene node that hasn't been touched
+       */
+      const baseZIndexForEdge = 10;
 
-      const parentIds = nodes.filter(n => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId).map(n => n?.parentId)
-      // const relevantSceneNodeId = parentId || id; // if cannot find node parent, that means it's a scene, and this is the scene id;
-      //const isEdgeAtForefront = firstNodeSceneId === relevantSceneNodeId;
-      //const isSceneAndFirstNodeSceneId = type === "scene" && firstNodeSceneId === id;
-      const aryForMathMin = new Set(parentIds.map(parentId => mostRecentlyTouchedSceneIds.findIndex(sceneId => parentId === sceneId)));
-      // I
-      const relevantSceneIdIndex = () => {
-        if (aryForMathMin.has(-1) && aryForMathMin.size > 1) {
-          aryForMathMin.delete(-1);
-        } 
-        
-        return Math.min(...aryForMathMin)
+      /**
+       * Part 2:
+       * Get the scene ID index of interest, which is the most recently touched scene node ID connected to this edge.
+       */
+      const sceneIdIndex = (): number => {
+        const parentIds = nodes
+          .filter((n) => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId)
+          .map((n) => n?.parentId);
+
+        const uniqueSceneIdsIndexedByMostRecentlyTouched = new Set(
+          parentIds.map((parentId) => mostRecentlyTouchedSceneIds.findIndex((sceneId) => parentId === sceneId))
+        );
+
+        // If an edge touches an untouched and touched scene, we want the ID of the touched scence, because that will have
+        // the highest z-index
+        if (uniqueSceneIdsIndexedByMostRecentlyTouched.has(-1) && uniqueSceneIdsIndexedByMostRecentlyTouched.size > 1) {
+          uniqueSceneIdsIndexedByMostRecentlyTouched.delete(-1);
+        }
+
+        return Math.min(...uniqueSceneIdsIndexedByMostRecentlyTouched);
       };
-      // const relevantSceneIdIndex = Math.min(...parentIds.map(parentId => mostRecentlyTouchedSceneIds.findIndex(sceneId => parentId === sceneId)));
-      const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => idx === -1 ? 0 : ary.length - idx;
-      //const sceneZIndex = (isEdgeAtForefront || isSceneAndFirstNodeSceneId ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
-      const sceneZIndex = (10 + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex()) * 10) + 5; // add +5 for nodes sitting on top of scenes
-      console.log("THIS IS INSIDE EDGE RENDERER")
-      console.log({ parentIds, relevantSceneIdIndex, sceneZIndex })
+      // A lower `sceneIdIndex` means that that scene has been the more recently touched. So if we subtract that number from number of all
+      // scene nodes that have been touched and multiply it by 10, we'll get scene z-indexes sequenced in increments of 10.
+      // And give edges belonging to scene nodes that haven't been touched the lowest z-index.
+      const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => (idx === -1 ? 0 : (ary.length - idx) * 10);
+
+      /**
+       * Part 3:
+       * Edges should have a higher z-index than scenes, so let's just give it the same z-index as nodes
+       */
+      const additionalZIndexForEdge = 5;
+
+      const sceneZIndex =
+        baseZIndexForEdge +
+        translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, sceneIdIndex()) +
+        additionalZIndexForEdge;
+
       return sceneZIndex;
-
-
-      /** old 
-      const firstNodeSceneId = mostRecentlyTouchedSceneIds[0];
-      const isEdgeAtForefront = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId).includes(firstNodeSceneId);
-      const highestSceneIdPartOfEdge = sceneIdsPerEdgeConnection(edgeTargetNodeId, edgeSourceNodeId)[0];
-      const relevantSceneIdIndex = mostRecentlyTouchedSceneIds.findIndex(sceneId => sceneId === highestSceneIdPartOfEdge);
-      const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => ary.length - idx;
-      const sceneZIndex = (isEdgeAtForefront ? 20 : 10) + translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, relevantSceneIdIndex); // nestLevel should be 1
-
-      return sceneZIndex;
-      */
     }
-    
+
     return 3;
-  }
+  };
 
   return (
     <div>
-      {renderConnectionLine && <svg width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, null, connectionNodeId, Boolean(renderConnectionLine)) }}>
+      {renderConnectionLine && (
+        <svg
+          width={width}
+          height={height}
+          className="react-flow__edges"
+          style={{
+            zIndex: calculateZIndexes(
+              props.mostRecentlyTouchedSceneIds,
+              null,
+              connectionNodeId,
+              Boolean(renderConnectionLine)
+            ),
+          }}
+        >
           <MarkerDefinitions color={arrowHeadColor} />
           <g>
             <ConnectionLine
@@ -305,15 +337,27 @@ const EdgeRenderer = (props: EdgeRendererProps) => {
               CustomConnectionLineComponent={connectionLineComponent}
             />
           </g>
-        </svg>}
+        </svg>
+      )}
       {edges.map((edge: Edge) => {
-        console.log({ iAmEdge: edge, edge, edgeProps: props });
         return (
-          <svg key={edge.id} width={width} height={height} className="react-flow__edges" style={{ zIndex: calculateZIndexes(props.mostRecentlyTouchedSceneIds, edge.target, edge.source, Boolean(renderConnectionLine)) }}>
+          <svg
+            key={edge.id}
+            width={width}
+            height={height}
+            className="react-flow__edges"
+            style={{
+              zIndex: calculateZIndexes(
+                props.mostRecentlyTouchedSceneIds,
+                edge.target,
+                edge.source,
+                Boolean(renderConnectionLine)
+              ),
+            }}
+          >
             <MarkerDefinitions color={arrowHeadColor} />
             <g>
               <Edge
-                key={`edge-${edge.id}`}
                 edge={edge}
                 props={props}
                 nodes={nodes}
