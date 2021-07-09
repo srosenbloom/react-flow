@@ -2,12 +2,16 @@ import React, { memo, useMemo, ComponentType, MouseEvent, CSSProperties } from '
 
 import { getNodesInside } from '../../utils/graph';
 import { useStoreState, useStoreActions } from '../../store/hooks';
-import { Node, NodeTypesType, WrapNodeProps, Edge,
+import {
+  Node,
+  NodeTypesType,
+  WrapNodeProps,
+  Edge,
   ConnectionLineType,
   ConnectionLineComponent,
   ConnectionMode,
-  OnEdgeUpdateFunc
- } from '../../types';
+  OnEdgeUpdateFunc,
+} from '../../types';
 import EdgeRenderer from '../EdgeRenderer/index';
 
 interface EdgeRendererProps {
@@ -98,7 +102,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
     const isSelectable = node.selectable || (elementsSelectable && typeof node.selectable === 'undefined');
     const isConnectable = node.connectable || (nodesConnectable && typeof node.connectable === 'undefined');
 
-    const children = visibleNodes.filter(n => n.parentId === node.id);
+    const children = visibleNodes.filter((n) => n.parentId === node.id);
 
     return (
       <NodeComponent
@@ -135,16 +139,14 @@ const NodeRenderer = (props: NodeRendererProps) => {
         resizeObserver={resizeObserver}
         mostRecentlyTouchedSceneIds={props.mostRecentlyTouchedSceneIds}
       >
-        <div style={{ position: 'relative' }}>
-          {children.map(child => renderNode(child, nestLevel + 1))}
-        </div>
+        <div style={{ position: 'relative' }}>{children.map((child) => renderNode(child, nestLevel + 1))}</div>
       </NodeComponent>
     );
   };
 
   return (
-    <div className="react-flow__nodes" style={transformStyle}>   
-      {visibleNodes.filter(node => !node.parentId).map(node => renderNode(node, 0))}
+    <div className="react-flow__nodes" style={transformStyle}>
+      {visibleNodes.filter((node) => !node.parentId).map((node) => renderNode(node, 0))}
       <EdgeRenderer {...props.edgeRendererProps} />
     </div>
   );
