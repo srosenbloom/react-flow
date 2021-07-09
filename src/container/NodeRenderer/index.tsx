@@ -2,12 +2,7 @@ import React, { memo, useMemo, ComponentType, MouseEvent } from 'react';
 
 import { getNodesInside } from '../../utils/graph';
 import { useStoreState, useStoreActions } from '../../store/hooks';
-import {
-  Node,
-  NodeTypesType,
-  WrapNodeProps,
-  Edge,
-} from '../../types';
+import { Node, NodeTypesType, WrapNodeProps, Edge } from '../../types';
 import { EdgeRenderer, EdgeRendererProps } from '../EdgeRenderer/index';
 
 interface NodeRendererProps {
@@ -39,16 +34,17 @@ const NodeRenderer = (props: NodeRendererProps) => {
   const height = useStoreState((state) => state.height);
   const nodes = useStoreState((state) => state.nodes);
   const updateNodeDimensions = useStoreActions((actions) => actions.updateNodeDimensions);
+
+  const visibleNodes = props.onlyRenderVisibleElements
+    ? getNodesInside(nodes, { x: 0, y: 0, width, height }, transform, true)
+    : nodes;
+
   const transformStyle = useMemo(
     () => ({
       transform: `translate(${transform[0]}px,${transform[1]}px) scale(${transform[2]})`,
     }),
     [transform[0], transform[1], transform[2]]
   );
-
-  const visibleNodes = props.onlyRenderVisibleElements
-    ? getNodesInside(nodes, { x: 0, y: 0, width, height }, transform, true)
-    : nodes;
 
   const resizeObserver = useMemo(() => {
     if (typeof ResizeObserver === 'undefined') {
