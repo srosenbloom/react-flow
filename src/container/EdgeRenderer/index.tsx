@@ -226,6 +226,10 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
   const renderConnectionLine = connectionNodeId && connectionHandleType;
 
   /**
+   * TODO: Ideally this would be using a nested level to determine a z-index, for cases
+   * where there may be more than 2 levels of nodes (not part of the product spec yet but
+   * could be in the future).
+   * 
    * This is calculating z-index styles for an edge in increments of 10 (+ 5): 15, 25, 35, 45, etc.
    * The strategy is to find the highest possible z-index associated with this edge.
    * If you're drawing the edge, then it should have the highest z-index value of anything

@@ -64,6 +64,10 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     const grid = useMemo(() => (snapToGrid ? snapGrid : [1, 1])! as [number, number], [snapToGrid, snapGrid]);
 
     /**
+     * TODO: Ideally this would be using a nested level to determine a z-index, for cases
+     * where there may be more than 2 levels of nodes (not part of the product spec yet but
+     * could be in the future).
+     * 
      * This is calculating z-index styles for overlay nodes and scene nodes.
      * This is calculating scene node z-indexes in increments of 10: 10, 20, 30, 40, etc.
      * Overlay node z-indexes use their parent's scene node z-index, but add an additional 5 because
@@ -75,7 +79,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
       if (mostRecentlyTouchedSceneIds) {
         const parentId = nodes.find((n) => n.id === id)?.parentId;
-        const sceneNodeId = type === 'scene' ? id : parentId;
+        const sceneNodeId = parentId || id;
         const sceneIdIndex = mostRecentlyTouchedSceneIds.findIndex((sceneId) => sceneNodeId === sceneId);
 
         /**
