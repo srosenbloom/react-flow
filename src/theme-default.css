@@ -6,7 +6,7 @@
 .react-flow__edge {
   &.selected {
     .react-flow__edge-path {
-      stroke: #555;
+      stroke: #fff;
     }
   }
 
@@ -17,14 +17,14 @@
 
   &.updating {
     .react-flow__edge-path {
-      stroke: #777;
+      stroke: #fff;
     }
   }
 }
 
 .react-flow__edge-path {
-  stroke: #b1b1b7;
-  stroke-width: 1;
+  stroke: #8CAFFF;
+  stroke-width: 2;
 }
 
 .react-flow__edge-text {
@@ -36,8 +36,8 @@
 }
 
 .react-flow__connection-path {
-  stroke: #b1b1b7;
-  stroke-width: 1;
+  stroke: #fff;
+  stroke-width: 2;
 }
 
 .react-flow__node {
