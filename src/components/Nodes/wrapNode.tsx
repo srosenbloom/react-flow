@@ -79,7 +79,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     const calculateZIndexes = (mostRecentlyTouchedSceneIds: string[] | undefined): number => {
       if (mostRecentlyTouchedSceneIds) {
         const parentId = nodes.find((n) => n.id === id)?.parentId;
-        const sceneNodeId = parentId || id;
+        const sceneNodeId = parentId ?? id;
         const sceneIdIndex = mostRecentlyTouchedSceneIds.findIndex((sceneId) => sceneNodeId === sceneId);
 
         /**
