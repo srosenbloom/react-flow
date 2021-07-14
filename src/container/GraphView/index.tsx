@@ -3,7 +3,6 @@ import React, { useEffect, useRef, memo } from 'react';
 import { useStoreActions, useStore } from '../../store/hooks';
 import FlowRenderer from '../FlowRenderer';
 import NodeRenderer from '../NodeRenderer';
-import EdgeRenderer from '../EdgeRenderer';
 import { onLoadProject, onLoadGetElements, onLoadToObject } from '../../utils/graph';
 import useZoomPanHelper from '../../hooks/useZoomPanHelper';
 
@@ -29,6 +28,7 @@ export interface GraphViewProps extends Omit<ReactFlowProps, 'onSelectionChange'
 
 const GraphView = ({
   nodeTypes,
+  mostRecentlyTouchedSceneIds,
   edgeTypes,
   onMove,
   onMoveStart,
@@ -215,6 +215,27 @@ const GraphView = ({
     }
   }, [connectionMode]);
 
+  const edgeRendererProps = {
+    edgeTypes,
+    onElementClick,
+    onEdgeDoubleClick,
+    connectionLineType,
+    connectionLineStyle,
+    connectionLineComponent,
+    connectionMode,
+    arrowHeadColor,
+    markerEndId,
+    onEdgeUpdate,
+    onlyRenderVisibleElements,
+    onEdgeContextMenu,
+    onEdgeMouseEnter,
+    onEdgeMouseMove,
+    onEdgeMouseLeave,
+    onEdgeUpdateStart,
+    edgeUpdaterRadius,
+    mostRecentlyTouchedSceneIds
+  }
+
   return (
     <FlowRenderer
       onPaneClick={onPaneClick}
@@ -243,7 +264,11 @@ const GraphView = ({
       onSelectionDrag={onSelectionDrag}
       onSelectionDragStop={onSelectionDragStop}
       onSelectionContextMenu={onSelectionContextMenu}
+      mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
     >
+      {/**
+       * Per our modifications to this library, NodeRenderer renders edges, too (which is the EdgeRenderer)
+       */}
       <NodeRenderer
         nodeTypes={nodeTypes}
         onElementClick={onElementClick}
@@ -259,25 +284,8 @@ const GraphView = ({
         snapToGrid={snapToGrid}
         snapGrid={snapGrid}
         onlyRenderVisibleElements={onlyRenderVisibleElements}
-      />
-      <EdgeRenderer
-        edgeTypes={edgeTypes}
-        onElementClick={onElementClick}
-        onEdgeDoubleClick={onEdgeDoubleClick}
-        connectionLineType={connectionLineType}
-        connectionLineStyle={connectionLineStyle}
-        connectionLineComponent={connectionLineComponent}
-        connectionMode={connectionMode}
-        arrowHeadColor={arrowHeadColor}
-        markerEndId={markerEndId}
-        onEdgeUpdate={onEdgeUpdate}
-        onlyRenderVisibleElements={onlyRenderVisibleElements}
-        onEdgeContextMenu={onEdgeContextMenu}
-        onEdgeMouseEnter={onEdgeMouseEnter}
-        onEdgeMouseMove={onEdgeMouseMove}
-        onEdgeMouseLeave={onEdgeMouseLeave}
-        onEdgeUpdateStart={onEdgeUpdateStart}
-        edgeUpdaterRadius={edgeUpdaterRadius}
+        mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
+        edgeRendererProps={edgeRendererProps}
       />
     </FlowRenderer>
   );

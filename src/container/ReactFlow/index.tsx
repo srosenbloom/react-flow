@@ -119,6 +119,7 @@ export interface ReactFlowProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   edgeUpdaterRadius?: number;
   nodeTypesId?: string;
   edgeTypesId?: string;
+  mostRecentlyTouchedSceneIds?: string[];
 }
 
 export type ReactFlowRefType = HTMLDivElement;
@@ -127,6 +128,7 @@ const ReactFlow = forwardRef<ReactFlowRefType, ReactFlowProps>(
   (
     {
       elements = [],
+      mostRecentlyTouchedSceneIds = [],
       className,
       nodeTypes = defaultNodeTypes,
       edgeTypes = defaultEdgeTypes,
@@ -274,6 +276,7 @@ const ReactFlow = forwardRef<ReactFlowRefType, ReactFlowProps>(
             onEdgeMouseLeave={onEdgeMouseLeave}
             onEdgeUpdateStart={onEdgeUpdateStart}
             edgeUpdaterRadius={edgeUpdaterRadius}
+            mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
           />
           <ElementUpdater elements={elements} />
           {onSelectionChange && <SelectionListener onSelectionChange={onSelectionChange} />}

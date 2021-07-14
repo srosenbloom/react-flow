@@ -15,6 +15,7 @@ export interface NodesSelectionProps {
   onSelectionDrag?: (event: MouseEvent, nodes: Node[]) => void;
   onSelectionDragStop?: (event: MouseEvent, nodes: Node[]) => void;
   onSelectionContextMenu?: (event: MouseEvent, nodes: Node[]) => void;
+  mostRecentlyTouchedSceneIds?: string[];
 }
 
 export default ({
