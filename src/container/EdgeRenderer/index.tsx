@@ -90,9 +90,8 @@ const Edge = ({
     return null;
   }
 
-  // const edgeType = edge.type || 'default';
-  // const EdgeComponent = props.edgeTypes[edgeType] || props.edgeTypes.default;
-  const EdgeComponent = props.edgeTypes['custom'] || props.edgeTypes.default;
+  const edgeType = edge.type || 'default';
+  const EdgeComponent = props.edgeTypes[edgeType] || props.edgeTypes.default;
   const targetNodeBounds = targetNode.__rf.handleBounds;
   // when connection type is loose we can define all handles as sources
   const targetNodeHandles =

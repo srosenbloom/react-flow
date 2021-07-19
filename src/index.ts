@@ -21,6 +21,7 @@ export {
   getRectOfNodes,
 } from './utils/graph';
 export { default as useZoomPanHelper } from './hooks/useZoomPanHelper';
+export { default as useKeyPress } from './hooks/useKeyPress';
 export { default as useUpdateNodeInternals } from './hooks/useUpdateNodeInternals';
 
 export * from './additional-components';
