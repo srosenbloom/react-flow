@@ -11,8 +11,10 @@ import UnlockIcon from '../../../assets/icons/unlock.svg';
 
 import useZoomPanHelper from '../../hooks/useZoomPanHelper';
 import { FitViewParams } from '../../types';
+import useKeyPress from '../../hooks/useKeyPress';
 
 export interface ControlProps extends HTMLAttributes<HTMLDivElement> {
+  OS: OSName | null;
   showZoom?: boolean;
   showFitView?: boolean;
   showInteractive?: boolean;
@@ -24,6 +26,11 @@ export interface ControlProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export interface ControlButtonProps extends HTMLAttributes<HTMLDivElement> {}
+
+enum OSName {
+  Windows = "Windows",
+  Mac = "Mac"
+}
 
 export const ControlButton: FC<ControlButtonProps> = ({ children, className, ...rest }) => (
   <div className={cc(['react-flow__controls-button', className])} {...rest}>
@@ -41,6 +48,7 @@ const Controls: FC<ControlProps> = ({
   onZoomOut,
   onFitView,
   onInteractiveChange,
+  OS,
   className,
   children,
 }) => {
@@ -73,7 +81,33 @@ const Controls: FC<ControlProps> = ({
 
   useEffect(() => {
     setIsVisible(true);
+    setInteractive?.(true);
   }, []);
+
+  const isControlPressed = useKeyPress("Control")
+  const isCommandPressed = useKeyPress("Command")
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isControlOrCommandPressedPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
+
+      if (isControlOrCommandPressedPerOS && e.keyCode === 187) {
+        e.preventDefault();
+
+        onZoomInHandler?.();
+      }
+
+      if (isControlOrCommandPressedPerOS && e.keyCode === 189) {
+        e.preventDefault();
+
+        onZoomOutHandler?.();
+      }
+      
+    } 
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onZoomInHandler, onZoomOutHandler, isControlPressed, isCommandPressed, OS]);
 
   if (!isVisible) {
     return null;
@@ -83,16 +117,16 @@ const Controls: FC<ControlProps> = ({
     <div className={mapClasses} style={style}>
       {showZoom && (
         <>
-          <ControlButton onClick={onZoomInHandler} className="react-flow__controls-zoomin">
+          <ControlButton onClick={onZoomInHandler} className={cc(["react-flow__controls-zoomin", "react-flow__controls-button-border-right"])}>
             <PlusIcon />
           </ControlButton>
-          <ControlButton onClick={onZoomOutHandler} className="react-flow__controls-zoomout">
+          <ControlButton onClick={onZoomOutHandler} className={cc(["react-flow__controls-zoomout", "react-flow__controls-button-border-right"])}>
             <MinusIcon />
           </ControlButton>
         </>
       )}
       {showFitView && (
-        <ControlButton className="react-flow__controls-fitview" onClick={onFitViewHandler}>
+        <ControlButton className={cc(["react-flow__controls-fitview", "react-flow__controls-button-border-right"])} onClick={onFitViewHandler}>
           <FitviewIcon />
         </ControlButton>
       )}

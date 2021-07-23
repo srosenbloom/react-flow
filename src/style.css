@@ -166,7 +166,7 @@
   position: absolute;
   z-index: 5;
   bottom: 10px;
-  left: 10px;
+  right: 10px;
 
   &-button {
     width: 24px;
@@ -176,6 +176,10 @@
       width: 100%;
     }
   }
+}
+
+.react-flow__controls > .react-flow__controls-button-border-right {
+  border-right: 1px solid #1c2020;
 }
 
 .react-flow__minimap {
