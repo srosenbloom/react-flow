@@ -85,19 +85,21 @@ const Controls: FC<ControlProps> = ({
   }, []);
 
   const isControlPressed = useKeyPress("Control")
-  const isCommandPressed = useKeyPress("Command")
+  const isCommandPressed = useKeyPress("Meta")
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const isControlOrCommandPressedPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
 
-      if (isControlOrCommandPressedPerOS && e.keyCode === 187) {
+      const isZoomingIn = isControlOrCommandPressedPerOS && e.key === "=";
+      if (isZoomingIn) {
         e.preventDefault();
 
         onZoomInHandler?.();
       }
 
-      if (isControlOrCommandPressedPerOS && e.keyCode === 189) {
+      const isZoomingOut = isControlOrCommandPressedPerOS && e.key === "-";
+      if (isZoomingOut) {
         e.preventDefault();
 
         onZoomOutHandler?.();
