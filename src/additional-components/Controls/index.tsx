@@ -84,32 +84,24 @@ const Controls: FC<ControlProps> = ({
     setInteractive?.(true);
   }, []);
 
+  // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
   const isControlPressed = useKeyPress("Control")
   const isCommandPressed = useKeyPress("Meta")
-  const isControlOrCommandPressedPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
+  const isValidControlOrCommandPressPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
+  const isPlusPressed = useKeyPress("=")
+  const isMinusPressed = useKeyPress("-")
+  const isZoomingIn = isValidControlOrCommandPressPerOS && isPlusPressed
+  const isZoomingOut = isValidControlOrCommandPressPerOS && isMinusPressed
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
+    if (isZoomingIn) {
+      onZoomInHandler?.();
+    }
 
-      const isZoomingIn = isControlOrCommandPressedPerOS && e.key === "=";
-      if (isZoomingIn) {
-        e.preventDefault();
-
-        onZoomInHandler?.();
-      }
-
-      const isZoomingOut = isControlOrCommandPressedPerOS && e.key === "-";
-      if (isZoomingOut) {
-        e.preventDefault();
-
-        onZoomOutHandler?.();
-      }
-      
-    } 
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onZoomInHandler, onZoomOutHandler, isControlOrCommandPressedPerOS]);
+    if (isZoomingOut) {
+      onZoomOutHandler?.();
+    }
+  }, [onZoomInHandler, onZoomOutHandler, isZoomingIn, isZoomingOut]);
 
   if (!isVisible) {
     return null;
