@@ -86,10 +86,10 @@ const Controls: FC<ControlProps> = ({
 
   const isControlPressed = useKeyPress("Control")
   const isCommandPressed = useKeyPress("Meta")
+  const isControlOrCommandPressedPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      const isControlOrCommandPressedPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
 
       const isZoomingIn = isControlOrCommandPressedPerOS && e.key === "=";
       if (isZoomingIn) {
@@ -109,7 +109,7 @@ const Controls: FC<ControlProps> = ({
     window.addEventListener('keydown', onKeyDown);
 
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onZoomInHandler, onZoomOutHandler, isControlPressed, isCommandPressed, OS]);
+  }, [onZoomInHandler, onZoomOutHandler, isControlOrCommandPressedPerOS]);
 
   if (!isVisible) {
     return null;
