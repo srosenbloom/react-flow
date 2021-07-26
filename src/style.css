@@ -178,10 +178,6 @@
   }
 }
 
-.react-flow__controls > .react-flow__controls-button-border-right {
-  border-right: 1px solid #1c2020;
-}
-
 .react-flow__minimap {
   position: absolute;
   z-index: 5;

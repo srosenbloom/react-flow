@@ -130,11 +130,11 @@
 }
 
 .react-flow__controls {
-  display: flex;
   box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
 
   &-button {
-    background: #444546;
+    background: #fefefe;
+    border-bottom: 1px solid #eee;
     box-sizing: content-box;
     display: flex;
     justify-content: center;
@@ -151,7 +151,7 @@
     }
 
     &:hover {
-      background: #616262;
+      background: #f4f4f4;
     }
   }
 }
