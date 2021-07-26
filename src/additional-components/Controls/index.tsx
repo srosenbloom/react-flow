@@ -11,10 +11,8 @@ import UnlockIcon from '../../../assets/icons/unlock.svg';
 
 import useZoomPanHelper from '../../hooks/useZoomPanHelper';
 import { FitViewParams } from '../../types';
-import useKeyPress from '../../hooks/useKeyPress';
 
 export interface ControlProps extends HTMLAttributes<HTMLDivElement> {
-  OS: OSName | null;
   showZoom?: boolean;
   showFitView?: boolean;
   showInteractive?: boolean;
@@ -26,11 +24,6 @@ export interface ControlProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export interface ControlButtonProps extends HTMLAttributes<HTMLDivElement> {}
-
-enum OSName {
-  Windows = "Windows",
-  Mac = "Mac"
-}
 
 export const ControlButton: FC<ControlButtonProps> = ({ children, className, ...rest }) => (
   <div className={cc(['react-flow__controls-button', className])} {...rest}>
@@ -48,7 +41,6 @@ const Controls: FC<ControlProps> = ({
   onZoomOut,
   onFitView,
   onInteractiveChange,
-  OS,
   className,
   children,
 }) => {
@@ -83,25 +75,6 @@ const Controls: FC<ControlProps> = ({
     setIsVisible(true);
     setInteractive?.(true);
   }, []);
-
-  // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
-  const isControlPressed = useKeyPress("Control")
-  const isCommandPressed = useKeyPress("Meta")
-  const isValidControlOrCommandPressPerOS = (OS === OSName.Windows && isControlPressed) || (OS === OSName.Mac && isCommandPressed)
-  const isPlusPressed = useKeyPress("=")
-  const isMinusPressed = useKeyPress("-")
-  const isZoomingIn = isValidControlOrCommandPressPerOS && isPlusPressed
-  const isZoomingOut = isValidControlOrCommandPressPerOS && isMinusPressed
-
-  useEffect(() => {
-    if (isZoomingIn) {
-      onZoomInHandler?.();
-    }
-
-    if (isZoomingOut) {
-      onZoomOutHandler?.();
-    }
-  }, [onZoomInHandler, onZoomOutHandler, isZoomingIn, isZoomingOut]);
 
   if (!isVisible) {
     return null;
