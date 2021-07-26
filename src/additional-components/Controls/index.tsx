@@ -73,7 +73,6 @@ const Controls: FC<ControlProps> = ({
 
   useEffect(() => {
     setIsVisible(true);
-    setInteractive?.(true);
   }, []);
 
   if (!isVisible) {
