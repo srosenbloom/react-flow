@@ -84,16 +84,16 @@ const Controls: FC<ControlProps> = ({
     <div className={mapClasses} style={style}>
       {showZoom && (
         <>
-          <ControlButton onClick={onZoomInHandler} className={"react-flow__controls-zoomin"}>
+          <ControlButton onClick={onZoomInHandler} className="react-flow__controls-zoomin">
             <PlusIcon />
           </ControlButton>
-          <ControlButton onClick={onZoomOutHandler} className={"react-flow__controls-zoomout"}>
+          <ControlButton onClick={onZoomOutHandler} className="react-flow__controls-zoomout">
             <MinusIcon />
           </ControlButton>
         </>
       )}
       {showFitView && (
-        <ControlButton className={"react-flow__controls-fitview"} onClick={onFitViewHandler}>
+        <ControlButton className="react-flow__controls-fitview" onClick={onFitViewHandler}>
           <FitviewIcon />
         </ControlButton>
       )}
