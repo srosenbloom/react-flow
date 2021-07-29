@@ -116,9 +116,11 @@ const NodeRenderer = (props: NodeRendererProps) => {
   };
 
   return (
-    <div className="react-flow__nodes" style={transformStyle}>
-      {visibleNodes.filter((node) => !node.parentId).map((node) => renderNode(node, 0))}
-      <EdgeRenderer {...props.edgeRendererProps} />
+    <div style={{zIndex: 3}}>
+      <div className="react-flow__nodes" /*style={transformStyle}*/>
+        {visibleNodes.filter((node) => !node.parentId).map((node) => renderNode(node, 0))}
+        </div>
+      <EdgeRenderer {...props.edgeRendererProps} transformStyle={transformStyle.transform}/>
     </div>
   );
 };

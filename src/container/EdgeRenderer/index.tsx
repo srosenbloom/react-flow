@@ -37,6 +37,7 @@ export interface EdgeRendererProps {
   onEdgeUpdateStart?: (event: React.MouseEvent, edge: Edge) => void;
   edgeUpdaterRadius?: number;
   mostRecentlyTouchedSceneIds?: string[];
+  transformStyle?: string;
 }
 
 interface EdgeWrapperProps {
@@ -188,6 +189,7 @@ const Edge = ({
       edgeUpdaterRadius={props.edgeUpdaterRadius}
       onEdgeDoubleClick={props.onEdgeDoubleClick}
       onEdgeUpdateStart={props.onEdgeUpdateStart}
+      transformStyle={props.transformStyle}
     />
   );
 };
@@ -304,7 +306,7 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
   };
 
   return (
-    <div>
+    <>
       {renderConnectionLine && (
         <svg
           width={width}
@@ -353,6 +355,7 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
                 edge.source,
                 Boolean(renderConnectionLine)
               ),
+              transform: props.transformStyle
             }}
           >
             <MarkerDefinitions color={arrowHeadColor} />
@@ -372,7 +375,7 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
           </svg>
         );
       })}
-    </div>
+    </>
   );
 };
 

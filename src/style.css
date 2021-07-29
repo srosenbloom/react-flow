@@ -87,7 +87,6 @@
   height: 100%;
   pointer-events: none;
   transform-origin: 0 0;
-  z-index: 3;
 }
 
 .react-flow__node {
