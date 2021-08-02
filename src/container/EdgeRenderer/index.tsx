@@ -213,6 +213,14 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
     [nodes, connectionNodeId]
   );
 
+  const reverseTransformStyle = useMemo(
+    () => ({
+      transform: `translate(${transform[0] * -1}px,${transform[1] * -1}px) scale(${Math.pow(transform[2], -1)})`,
+    }),
+    [transform[0], transform[1], transform[2]]
+  );
+
+
   if (!width) {
     return null;
   }
@@ -355,7 +363,7 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
                 edge.source,
                 Boolean(renderConnectionLine)
               ),
-              transform: props.transformStyle
+              transform: reverseTransformStyle.transform
             }}
           >
             <MarkerDefinitions color={arrowHeadColor} />

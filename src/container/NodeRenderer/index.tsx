@@ -38,12 +38,12 @@ const NodeRenderer = (props: NodeRendererProps) => {
     ? getNodesInside(nodes, { x: 0, y: 0, width, height }, transform, true)
     : nodes;
 
-  // const transformStyle = useMemo(
-  //   () => ({
-  //     transform: `translate(${transform[0]}px,${transform[1]}px) scale(${transform[2]})`,
-  //   }),
-  //   [transform[0], transform[1], transform[2]]
-  // );
+  const transformStyle = useMemo(
+    () => ({
+      transform: `translate(${transform[0]}px,${transform[1]}px) scale(${transform[2]})`,
+    }),
+    [transform[0], transform[1], transform[2]]
+  );
 
   const resizeObserver = useMemo(() => {
     if (typeof ResizeObserver === 'undefined') {
@@ -116,11 +116,9 @@ const NodeRenderer = (props: NodeRendererProps) => {
 
   return (
     <div style={{zIndex: 3}}>
-      <div className="react-flow__nodes">
-        {/* <div style={transformStyle}> */}
+      <div className="react-flow__nodes" style={transformStyle}>
         {visibleNodes.filter((node) => !node.parentId).map((node) => renderNode(node, 0))}
-        </div>
-        {/* </div> */}
+      </div>
       <EdgeRenderer {...props.edgeRendererProps}/>
     </div>
   );
