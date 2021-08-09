@@ -223,156 +223,47 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
     onlyRenderVisibleElements,
   } = props;
 
+  const transformStyle = `translate(${transform[0]},${transform[1]}) scale(${transform[2]})`;
+
   const renderConnectionLine = connectionNodeId && connectionHandleType;
 
-  /**
-   * TODO: Ideally this would be using a nested level to determine a z-index, for cases
-   * where there may be more than 2 levels of nodes (not part of the product spec yet but
-   * could be in the future).
-   * 
-   * This is calculating z-index styles for an edge in increments of 10 (+ 5): 15, 25, 35, 45, etc.
-   * The strategy is to find the highest possible z-index associated with this edge.
-   * If you're drawing the edge, then it should have the highest z-index value of anything
-   * in our node view.
-   * For the edges that are connected to two nodes, use the z-index value of the most recently
-   * touched scene node ID, since if an edge belongs to the most recently touched scene,
-   * then we want to see those associated edges moved to the forefront as well.
-   * In case `mostRecentlyTouchedSceneIds` is `undefined`, which we wouldn't expect to happen, just apply a
-   * z-index that matches the default z-indexing defined in src/style.css
-   */
-  const calculateZIndexes = (
-    mostRecentlyTouchedSceneIds: string[] | undefined,
-    edgeTargetNodeId: string | null,
-    edgeSourceNodeId: string | null,
-    shouldRenderConnectionLine: boolean
-  ): number => {
-    // You are drawing an edge if you should render a connection line but the target or source node is still `null`
-    const isDrawingEdge = shouldRenderConnectionLine && !(Boolean(edgeSourceNodeId) && Boolean(edgeTargetNodeId));
-    if (isDrawingEdge) {
-      return 10000000; // an arbitrarily high z-index while drawing
-    }
-
-    if (mostRecentlyTouchedSceneIds) {
-      /**
-       * Part 1:
-       * First give a default z-index of 10 for every edge connected to a scene node that hasn't been touched
-       */
-      const baseZIndexForEdge = 10;
-
-      /**
-       * Part 2:
-       * Get the scene ID index of interest, which is the most recently touched scene node ID connected to this edge.
-       */
-      const sceneIdIndex = (): number => {
-        const parentIds = nodes
-          .filter((n) => n.id === edgeTargetNodeId || n.id === edgeSourceNodeId)
-          .map((n) => n?.parentId);
-
-        const uniqueSceneIdsIndexedByMostRecentlyTouched = new Set(
-          parentIds.map((parentId) => mostRecentlyTouchedSceneIds.findIndex((sceneId) => parentId === sceneId))
-        );
-
-        // If an edge touches an untouched and touched scene, we want the ID of the touched scence, because that will have
-        // the highest z-index
-        if (uniqueSceneIdsIndexedByMostRecentlyTouched.has(-1) && uniqueSceneIdsIndexedByMostRecentlyTouched.size > 1) {
-          uniqueSceneIdsIndexedByMostRecentlyTouched.delete(-1);
-        }
-
-        return Math.min(...uniqueSceneIdsIndexedByMostRecentlyTouched);
-      };
-      // A lower `sceneIdIndex` means that that scene has been the more recently touched. So if we subtract that number from number of all
-      // scene nodes that have been touched and multiply it by 10, we'll get edge z-indexes sequenced in increments of 10.
-      // And give edges belonging to scene nodes that haven't been touched the lowest z-index (though we actually wouldn't expect this to happen).
-      const translateSceneIdIndexToZIndex = (ary: string[], idx: number) => (idx === -1 ? 0 : (ary.length - idx) * 10);
-
-      /**
-       * Part 3:
-       * Edges should have a higher z-index than scenes, so let's just give it the same z-index as nodes
-       */
-      const additionalZIndexForEdge = 5;
-
-      const sceneZIndex =
-        baseZIndexForEdge +
-        translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, sceneIdIndex()) +
-        additionalZIndexForEdge;
-
-      return sceneZIndex;
-    }
-
-    // Default z-index found in src/style.css
-    return 3;
-  };
-
   return (
-    <div>
-      {renderConnectionLine && (
-        <svg
-          width={width}
-          height={height}
-          className="react-flow__edges"
-          style={{
-            zIndex: calculateZIndexes(
-              props.mostRecentlyTouchedSceneIds,
-              null,
-              connectionNodeId,
-              Boolean(renderConnectionLine)
-            ),
-          }}
-        >
-          <MarkerDefinitions color={arrowHeadColor} />
-          <g>
-            <ConnectionLine
-              nodes={nodes}
-              connectionNodeId={connectionNodeId!}
-              connectionHandleId={connectionHandleId}
-              connectionHandleType={connectionHandleType!}
-              connectionPositionX={connectionPosition.x}
-              connectionPositionY={connectionPosition.y}
-              transform={transform}
-              connectionLineStyle={connectionLineStyle}
-              connectionLineType={connectionLineType}
-              connectionSourceOffsetX={connectionSourceOffsetX}
-              connectionSourceOffsetY={connectionSourceOffsetY}
-              isConnectable={nodesConnectable}
-              CustomConnectionLineComponent={connectionLineComponent}
-            />
-          </g>
-        </svg>
-      )}
-      {edges.map((edge: Edge) => {
-        return (
-          <svg
+    <svg width={width} height={height} className="react-flow__edges">
+      <MarkerDefinitions color={arrowHeadColor} />
+      <g transform={transformStyle}>
+        {edges.map((edge: Edge) => (
+          <Edge
             key={edge.id}
+            edge={edge}
+            props={props}
+            nodes={nodes}
+            selectedElements={selectedElements}
+            elementsSelectable={elementsSelectable}
+            transform={transform}
             width={width}
             height={height}
-            className="react-flow__edges"
-            style={{
-              zIndex: calculateZIndexes(
-                props.mostRecentlyTouchedSceneIds,
-                edge.target,
-                edge.source,
-                Boolean(renderConnectionLine)
-              ),
-            }}
-          >
-            <MarkerDefinitions color={arrowHeadColor} />
-            <g>
-              <Edge
-                edge={edge}
-                props={props}
-                nodes={nodes}
-                selectedElements={selectedElements}
-                elementsSelectable={elementsSelectable}
-                transform={transform}
-                width={width}
-                height={height}
-                onlyRenderVisibleElements={onlyRenderVisibleElements}
-              />
-            </g>
-          </svg>
-        );
-      })}
-    </div>
+            onlyRenderVisibleElements={onlyRenderVisibleElements}
+          />
+        ))}
+        {renderConnectionLine && (
+          <ConnectionLine
+            nodes={nodes}
+            connectionNodeId={connectionNodeId!}
+            connectionHandleId={connectionHandleId}
+            connectionHandleType={connectionHandleType!}
+            connectionPositionX={connectionPosition.x}
+            connectionPositionY={connectionPosition.y}
+            transform={transform}
+            connectionLineStyle={connectionLineStyle}
+            connectionLineType={connectionLineType}
+            connectionSourceOffsetX={connectionSourceOffsetX}
+            connectionSourceOffsetY={connectionSourceOffsetY}
+            isConnectable={nodesConnectable}
+            CustomConnectionLineComponent={connectionLineComponent}
+          />
+        )}
+      </g>
+    </svg>
   );
 };
 

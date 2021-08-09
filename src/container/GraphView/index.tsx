@@ -284,7 +284,6 @@ const GraphView = ({
         onEdgeMouseLeave={onEdgeMouseLeave}
         onEdgeUpdateStart={onEdgeUpdateStart}
         edgeUpdaterRadius={edgeUpdaterRadius}
-        mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
       />
     </FlowRenderer>
   );
