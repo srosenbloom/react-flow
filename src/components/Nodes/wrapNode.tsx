@@ -51,7 +51,6 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     children,
     mostRecentlyTouchedSceneIds,
   }: React.PropsWithChildren<WrapNodeProps>) => {
-    const observerInitialized = useRef<boolean>(false);
     const updateNodeDimensions = useStoreActions((actions) => actions.updateNodeDimensions);
     const addSelectedElements = useStoreActions((actions) => actions.addSelectedElements);
     const updateNodePosDiff = useStoreActions((actions) => actions.updateNodePosDiff);
@@ -267,16 +266,13 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     );
 
     useLayoutEffect(() => {
-      // the resize observer calls an updateNodeDimensions initially.
-      // We don't need to force another dimension update if it hasn't happened yet
-      if (nodeElement.current && !isHidden && observerInitialized.current) {
+      if (nodeElement.current && !isHidden) {
         updateNodeDimensions([{ id, nodeElement: nodeElement.current, forceUpdate: true }]);
       }
     }, [id, isHidden, sourcePosition, targetPosition]);
 
     useEffect(() => {
       if (nodeElement.current) {
-        observerInitialized.current = true;
         const currNode = nodeElement.current;
         resizeObserver?.observe(currNode);
 

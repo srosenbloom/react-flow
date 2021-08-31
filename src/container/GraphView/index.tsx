@@ -73,6 +73,7 @@ const GraphView = ({
   defaultZoom,
   defaultPosition,
   translateExtent,
+  preventScrolling,
   nodeExtent,
   arrowHeadColor,
   markerEndId,
@@ -93,6 +94,7 @@ const GraphView = ({
   onEdgeMouseLeave,
   edgeUpdaterRadius,
   onEdgeUpdateStart,
+  onEdgeUpdateEnd,
 }: GraphViewProps) => {
   const isInitialized = useRef<boolean>(false);
   const setOnConnect = useStoreActions((actions) => actions.setOnConnect);
@@ -232,6 +234,7 @@ const GraphView = ({
     onEdgeMouseMove,
     onEdgeMouseLeave,
     onEdgeUpdateStart,
+    onEdgeUpdateEnd,
     edgeUpdaterRadius,
     mostRecentlyTouchedSceneIds
   }
@@ -265,6 +268,7 @@ const GraphView = ({
       onSelectionDragStop={onSelectionDragStop}
       onSelectionContextMenu={onSelectionContextMenu}
       mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
+      preventScrolling={preventScrolling}
     >
       {/**
        * Per our modifications to this library, NodeRenderer renders edges, too (which is the EdgeRenderer)
