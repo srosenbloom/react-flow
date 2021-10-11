@@ -9,6 +9,7 @@ import useZoomPanHelper from '../../hooks/useZoomPanHelper';
 import { ReactFlowProps } from '../ReactFlow';
 
 import { NodeTypesType, EdgeTypesType, ConnectionLineType, KeyCode } from '../../types';
+import EdgeRenderer from '../EdgeRenderer';
 
 export interface GraphViewProps extends Omit<ReactFlowProps, 'onSelectionChange' | 'elements'> {
   nodeTypes: NodeTypesType;
@@ -217,28 +218,6 @@ const GraphView = ({
     }
   }, [connectionMode]);
 
-  const edgeRendererProps = {
-    edgeTypes,
-    onElementClick,
-    onEdgeDoubleClick,
-    connectionLineType,
-    connectionLineStyle,
-    connectionLineComponent,
-    connectionMode,
-    arrowHeadColor,
-    markerEndId,
-    onEdgeUpdate,
-    onlyRenderVisibleElements,
-    onEdgeContextMenu,
-    onEdgeMouseEnter,
-    onEdgeMouseMove,
-    onEdgeMouseLeave,
-    onEdgeUpdateStart,
-    onEdgeUpdateEnd,
-    edgeUpdaterRadius,
-    mostRecentlyTouchedSceneIds
-  }
-
   return (
     <FlowRenderer
       onPaneClick={onPaneClick}
@@ -289,7 +268,26 @@ const GraphView = ({
         snapGrid={snapGrid}
         onlyRenderVisibleElements={onlyRenderVisibleElements}
         mostRecentlyTouchedSceneIds={mostRecentlyTouchedSceneIds}
-        edgeRendererProps={edgeRendererProps}
+      />
+      <EdgeRenderer
+        edgeTypes={edgeTypes}
+        onElementClick={onElementClick}
+        onEdgeDoubleClick={onEdgeDoubleClick}
+        connectionLineType={connectionLineType}
+        connectionLineStyle={connectionLineStyle}
+        connectionLineComponent={connectionLineComponent}
+        connectionMode={connectionMode}
+        arrowHeadColor={arrowHeadColor}
+        markerEndId={markerEndId}
+        onEdgeUpdate={onEdgeUpdate}
+        onlyRenderVisibleElements={onlyRenderVisibleElements}
+        onEdgeContextMenu={onEdgeContextMenu}
+        onEdgeMouseEnter={onEdgeMouseEnter}
+        onEdgeMouseMove={onEdgeMouseMove}
+        onEdgeMouseLeave={onEdgeMouseLeave}
+        onEdgeUpdateStart={onEdgeUpdateStart}
+        onEdgeUpdateEnd={onEdgeUpdateEnd}
+        edgeUpdaterRadius={edgeUpdaterRadius}
       />
     </FlowRenderer>
   );
