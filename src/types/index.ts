@@ -49,6 +49,7 @@ export interface Node<T = any> {
   draggable?: boolean;
   selectable?: boolean;
   connectable?: boolean;
+  dragHandle?: string;
   parentId?: ElementId;
 }
 
@@ -187,6 +188,7 @@ export interface NodeProps<T = any> {
   targetPosition?: Position;
   sourcePosition?: Position;
   isDragging?: boolean;
+  dragHandle?: string;
 }
 
 export interface NodeComponentProps<T = any> {
@@ -211,6 +213,7 @@ export interface NodeComponentProps<T = any> {
   onNodeDragStop?: (node: Node) => void;
   style?: CSSProperties;
   isDragging?: boolean;
+  dragHandle?: string;
 }
 
 export interface WrapNodeProps<T = any> {
@@ -244,6 +247,7 @@ export interface WrapNodeProps<T = any> {
   snapGrid?: SnapGrid;
   isDragging?: boolean;
   resizeObserver: ResizeObserver | null;
+  dragHandle?: string;
   mostRecentlyTouchedSceneIds?: string[];
 }
 

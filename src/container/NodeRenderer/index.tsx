@@ -105,6 +105,7 @@ const NodeRenderer = (props: NodeRendererProps) => {
         isSelectable={isSelectable}
         isConnectable={isConnectable}
         resizeObserver={resizeObserver}
+            dragHandle={node.dragHandle}
         mostRecentlyTouchedSceneIds={props.mostRecentlyTouchedSceneIds}
       >
         <div style={{ position: 'relative' }}>{children.map((child) => renderNode(child, nestLevel + 1))}</div>
