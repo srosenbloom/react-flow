@@ -51,7 +51,11 @@ interface EdgeWrapperProps {
   height: number;
   onlyRenderVisibleElements: boolean;
   connectionMode?: ConnectionMode;
+  sourceEdgeOffsets: EdgeOffsetDictionary;
+  targetEdgeOffsets: EdgeOffsetDictionary;
 }
+
+type EdgeOffsetDictionary = Record<string, [number, number]>;
 
 const Edge = ({
   edge,
@@ -64,6 +68,8 @@ const Edge = ({
   height,
   onlyRenderVisibleElements,
   connectionMode,
+  sourceEdgeOffsets,
+  targetEdgeOffsets
 }: EdgeWrapperProps) => {
   const sourceHandleId = edge.sourceHandle || null;
   const targetHandleId = edge.targetHandle || null;
@@ -123,15 +129,9 @@ const Edge = ({
     targetPosition
   );
 
-  const [sourceEdgeOffsetX, sourceEdgeOffsetY] = useMemo(() => getEdgeOffsets(nodes, edge.source), [
-    nodes,
-    edge.source,
-  ]);
+  const [sourceEdgeOffsetX, sourceEdgeOffsetY] = sourceEdgeOffsets[edge.id];
 
-  const [targetEdgeOffsetX, targetEdgeOffsetY] = useMemo(() => getEdgeOffsets(nodes, edge.target), [
-    nodes,
-    edge.target,
-  ]);
+  const [targetEdgeOffsetX, targetEdgeOffsetY] = targetEdgeOffsets[edge.id];
 
   const isVisible = onlyRenderVisibleElements
     ? isEdgeVisible({
@@ -213,6 +213,20 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
     [nodes, connectionNodeId]
   );
 
+  const sourceEdgeOffsets = useMemo(() =>
+    edges.reduce((acc, cur) => ({
+      ...acc,
+      [cur.id]: getEdgeOffsets(nodes, cur.source)
+    }), {} as EdgeOffsetDictionary)
+  , [nodes, edges]);
+
+  const targetEdgeOffsets = useMemo(() =>
+      edges.reduce((acc, cur) => ({
+        ...acc,
+        [cur.id]: getEdgeOffsets(nodes, cur.target)
+      }), {} as EdgeOffsetDictionary)
+  , [nodes, edges]);
+
   if (!width) {
     return null;
   }
@@ -245,6 +259,8 @@ const BaseEdgeRenderer = (props: EdgeRendererProps) => {
             width={width}
             height={height}
             onlyRenderVisibleElements={onlyRenderVisibleElements}
+            sourceEdgeOffsets={sourceEdgeOffsets}
+            targetEdgeOffsets={targetEdgeOffsets}
           />
         ))}
         {renderConnectionLine && (
