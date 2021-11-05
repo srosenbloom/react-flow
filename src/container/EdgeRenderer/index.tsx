@@ -79,7 +79,7 @@ const Edge = ({
     (connection: Connection) => {
       props.onEdgeUpdate?.(edge, connection);
     },
-    [edge]
+    [edge, props.onEdgeUpdate]
   );
 
   if (!sourceNode) {
