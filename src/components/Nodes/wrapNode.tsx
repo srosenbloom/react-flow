@@ -103,11 +103,18 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
          */
         const additionalZIndexForOverlayNodes = parentId ? 5 : 0;
 
+        /**
+         *  Part 4:
+         *  If an operation node is currently being dragged, increment the z-index by one so it appears above all other nodes.
+         */
+
+        const isDraggingZIndex = isDragging ? 1:0;
+
         const sceneZIndex =
           baseZIndexForNode +
           translateSceneIdIndexToZIndex(mostRecentlyTouchedSceneIds, sceneIdIndex) +
-          additionalZIndexForOverlayNodes;
-
+          additionalZIndexForOverlayNodes +
+          isDraggingZIndex;
         return sceneZIndex;
       }
 
@@ -117,6 +124,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
 
     const calculatedZIndexValue = useMemo(() => calculateZIndexes(mostRecentlyTouchedSceneIds), [
       mostRecentlyTouchedSceneIds,
+      isDragging
     ]);
 
     const nodeStyle: CSSProperties = useMemo(
@@ -124,7 +132,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         zIndex: calculatedZIndexValue,
         transform: `translate(${xPos}px,${yPos}px)`,
         pointerEvents:
-          isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave ? 'all' : 'none',
+        isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave ? 'all' : 'none',
         // prevents jumping of nodes on start
         opacity: isInitialized ? 1 : 0,
         ...style,
@@ -218,8 +226,6 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
     const onDrag = useCallback(
       (event: DraggableEvent, draggableData: DraggableData) => {
         if (onNodeDrag) {
-          node.position.x += draggableData.deltaX;
-          node.position.y += draggableData.deltaY;
           onNodeDrag(event as MouseEvent, node);
         }
 
