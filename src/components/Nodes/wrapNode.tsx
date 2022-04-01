@@ -132,7 +132,7 @@ export default (NodeComponent: ComponentType<NodeComponentProps>) => {
         zIndex: calculatedZIndexValue,
         transform: `translate(${xPos}px,${yPos}px)`,
         pointerEvents:
-        isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave ? 'all' : 'none',
+        !isDragging && (isSelectable || isDraggable || onClick || onMouseEnter || onMouseMove || onMouseLeave) ? 'all' : 'none',
         // prevents jumping of nodes on start
         opacity: isInitialized ? 1 : 0,
         ...style,
